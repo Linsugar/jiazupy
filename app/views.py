@@ -8,20 +8,20 @@ from rest_framework import mixins, status
 from app.Serialiaers.UserSerializers import User_Serializers,Image_Serializers
 from app.models import User, User_token,User_Image
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
-
+from app.untils.Md5Catch import Power
 
 class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializer_class = User_Serializers
-    queryset = User.objects.all()
     def list(self, request, *args, **kwargs):
-
-        queryset = self.filter_queryset(queryset=self.queryset)
+        print(request.query_params['user_mobile'])
+        get_queryset = User.objects.filter(user_mobile=request.query_params['user_mobile']).first()
+        queryset = self.filter_queryset(queryset=get_queryset)
         print(queryset)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=False)
         return JsonResponse(serializer.data,safe=False)
 
     def create(self, request, *args, **kwargs):
@@ -30,25 +30,24 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             'token':None,
             'coode':None
         }
-        from app.untils.Md5Catch import Power
-        user_mobile = request.data['user_mobile']
-        User_Md5 = Power().Power_Md5(user_mobile)
-        obj = User.objects.filter(user_mobile=user_mobile).first()
+
+        mobile = request.data['user_mobile']
+        obj = User.objects.filter(user_mobile=mobile).first()
         if not obj:
+            # 进行加密
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
+            User_Md5 = Power().Power_Md5(mobile)
+            obj1 = User.objects.filter(user_mobile=request.data['user_mobile']).first()
+            User_token.objects.update_or_create(token_id=obj1, defaults={'user_token': User_Md5})
             Rp['msg']="注册成功"
             Rp['token']=User_Md5
             Rp['coode']="2001"
-            return Response(Rp)
         else:
-            User_token.objects.update_or_create(user=obj,defaults={'user_token': User_Md5})
-            Rp['msg'] = "登录成功"
-            Rp['token'] = User_Md5
-            Rp['coode'] = "2002"
-            return Response(Rp)
-        # return Response(status=status.HTTP_201_CREATED)
+            Rp['msg'] = "您输入的手机号已存在"
+            Rp['coode'] = "2004"
+        return Response(Rp)
 
 
 class ImageCheck(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
