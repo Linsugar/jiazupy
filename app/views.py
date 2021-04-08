@@ -1,3 +1,5 @@
+import random
+
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -13,10 +15,10 @@ from app.untils.Md5Catch import Power
 class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializer_class = User_Serializers
     def list(self, request, *args, **kwargs):
-        print(request.query_params['user_mobile'])
-        get_queryset = User.objects.filter(user_mobile=request.query_params['user_mobile']).first()
+        user_mobile = request.query_params['user_mobile']
+        user_pwd = request.query_params['user_pwd']
+        get_queryset = User.objects.filter(user_mobile=user_mobile,user_pwd=user_pwd).first()
         queryset = self.filter_queryset(queryset=get_queryset)
-        print(queryset)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -25,17 +27,28 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
         return JsonResponse(serializer.data,safe=False)
 
     def create(self, request, *args, **kwargs):
+        Redata ={
+            'user_id':random.randint(1000000000,80000000000),
+            'invite_number':666666,
+            'platform':request.data['platform'],
+            'deviceid':request.data['deviceid'],
+            'user_mobile':request.data['user_mobile'],
+            'user_pwd':request.data['user_pwd'],
+            'user_name':request.data['user_name'],
+            'avator_image':'333',
+            'city':request.data['city'],
+            'create_ip':request.META.get("REMOTE_ADDR"),
+        }
         Rp = {
             'msg':None,
             'token':None,
             'coode':None
         }
-
         mobile = request.data['user_mobile']
         obj = User.objects.filter(user_mobile=mobile).first()
         if not obj:
             # 进行加密
-            serializer = self.get_serializer(data=request.data)
+            serializer = self.get_serializer(data=Redata)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             User_Md5 = Power().Power_Md5(mobile)

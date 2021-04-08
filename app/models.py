@@ -4,6 +4,7 @@ from django.db import models
 from django.db import models
 
 # Create your models here.
+
 class User(models.Model):
     # 用户唯一id
     user_id = models.CharField(max_length=21,unique=True)
