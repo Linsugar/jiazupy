@@ -27,8 +27,9 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
         return JsonResponse(serializer.data,safe=False)
 
     def create(self, request, *args, **kwargs):
+        userid = random.randint(1000000000,80000000000)
         Redata ={
-            'user_id':random.randint(1000000000,80000000000),
+            'user_id':userid,
             'invite_number':666666,
             'platform':request.data['platform'],
             'deviceid':request.data['deviceid'],
@@ -57,6 +58,7 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             Rp['msg']="注册成功"
             Rp['token']=User_Md5
             Rp['coode']="2001"
+            Rp['userid']=userid
         else:
             Rp['msg'] = "您输入的手机号已存在"
             Rp['coode'] = "2004"
