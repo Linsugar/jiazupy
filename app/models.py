@@ -42,5 +42,14 @@ class User_Image(models.Model):
     Up_Time = models.TimeField(auto_now=True)
     Up_ImageUrl = models.ImageField('照片',upload_to='%Y/%m/%d/')
 
+class Dynamic_Image(models.Model):
+    user_id = models.CharField(max_length=16)
+    Up_Time = models.DateTimeField(auto_now=True)
+    Old_Imagename = models.CharField(max_length=64)
+    New_Imagename = models.CharField(max_length=64)
+    Up_ImageUrl = models.CharField(max_length=200)
+    Up_Context = models.CharField(max_length=200)
+    Up_Title = models.CharField(max_length=64)
+    Up_addres = models.CharField(max_length=16)
 
 

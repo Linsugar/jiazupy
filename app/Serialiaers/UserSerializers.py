@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from app.models import User,User_Image
+from app.models import User, User_Image, Dynamic_Image
 
 
 class User_Serializers(ModelSerializer):
@@ -14,10 +14,11 @@ class User_Serializers(ModelSerializer):
 
 class Image_Serializers(ModelSerializer):
     class Meta:
-        model = User_Image
+        model = Dynamic_Image
         fields = "__all__"
 
     def validate(self, attrs):
+        print('发布动图：%s'%attrs)
         print("进入图片")
         return  attrs
 

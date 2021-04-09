@@ -1,16 +1,15 @@
 import random
 
 from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework.response import Response
 
 from rest_framework.viewsets import GenericViewSet,generics
 from rest_framework import mixins, status
-# Create your views here.
 from app.Serialiaers.UserSerializers import User_Serializers,Image_Serializers
-from app.models import User, User_token,User_Image
-from app.untils.UoOssFile.connectBucket import Bucket_Handle
+from app.models import User, User_token, User_Image, Dynamic_Image
 from app.untils.Md5Catch import Power
+from app.untils.UoOssFile.connectBucket import Bucket_Handle
+
 
 class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializer_class = User_Serializers
@@ -65,11 +64,12 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
         return Response(Rp)
 
 
-class ImageCheck(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
-    queryset = User_Image.objects.all()
+class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        user_id = request.data['user_id']
+        query = Dynamic_Image.objects.filter(user_id=user_id).all()
+        queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -78,27 +78,25 @@ class ImageCheck(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        print(request.FILES.get("image", None))
-        print(request.data)
-        finame = "imag"
+        request.FILES.get("image", None)
         filpath =  request.FILES.get("image", None)
-        Rp = {
-            'msg': None,
-            'token': None,
-            'coode': None
+        tempFilePath = filpath.temporary_file_path()
+        new_filename = request.data['new_filename']
+        up_title = request.data['up_title']
+        up_context=request.data['up_context']
+        up_addres= request.data['up_addres']
+        user_id = request.data['user_id']
+        upResult = Bucket_Handle().Upload_File(filename=new_filename,filepath=tempFilePath)
+        updata={
+            'user_id':user_id,
+            'Old_Imagename':str(filpath),
+            'New_Imagename':str(new_filename),
+            'Up_ImageUrl':upResult['url'],
+            'Up_Title':up_title,
+            'Up_Context':up_context,
+            'Up_addres':up_addres,
         }
-        obj = User.objects.filter(user_id=2).first()
-        if not obj:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            Rp['msg'] = "注册成功"
-            Rp['coode'] = "2001"
-            return Response(Rp)
-        elif not request.FILES['image']:
-            return Response("没有文件")
-        else:
-            User_Image.objects.update_or_create(user_id=obj, defaults={'Up_ImageUrl': filpath})
-            Rp['msg'] = "登录成功"
-            Rp['coode'] = "2002"
-            return Response(Rp)
+        serializer = self.get_serializer(data=updata)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return JsonResponse(updata)

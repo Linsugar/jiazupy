@@ -5,45 +5,43 @@ from qcloud_cos import CosConfig
 from qcloud_cos import CosS3Client
 import sys
 import logging
-
+from qiniu import Auth, put_file, etag
 class Bucket_Handle():  #存储桶操作
     def __init__(self):
-        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-        secret_id = 'AKIDPZYIn4luQnuoVCnq9KGyRuHPGuJmvzjD'  # 替换为用户的 secretId
-        secret_key = 'OVQ7vUnpcvWrwl13qOaaKZgYCoCLEsOi'  # 替换为用户的 secretKey
-        region = 'ap-chengdu'  # 替换为用户的 Region
-        token = None  # 使用临时密钥需要传入 Token，默认为空，可不填
-        # proxies = {
-        #     'http': '127.0.0.1:80',  # 替换为用户的 HTTP代理地址
-        #     'https': '127.0.0.1:443'  # 替换为用户的 HTTPS代理地址
-        # }
-        endpoint = 'cos.accelerate.myqcloud.com'
-        scheme = 'https'  # 指定使用 http/https 协议来访问 COS，默认为 https，可不填
-        config = CosConfig(Region=region,Endpoint=endpoint,SecretId=secret_id, SecretKey=secret_key, Token=token, Scheme=scheme)
-        # 2. 获取客户端对象
-        self.client = CosS3Client(config)
+        access_key = 'cyIcJU0RXy1nD1t0I6DauqqCblEcFX1npjtld5Ky'
+        secret_key = 'Vt7Yw39U3COUnW1uavsLMRpPiSCtQ8mdJ0Hl2vmK'
+        self.q = Auth(access_key=access_key,secret_key=secret_key)
+    #
+    # def Create_Bucket(self,BucketName):
+    #     # 创建存储桶名字
+    #     BucketNmae=self.client.create_bucket(Bucket=BucketName)
+    #     return BucketNmae
+    #
+    # def Serach_Bucket(self):
+    #     # 查询存储桶列表
+    #     print(self.client.list_buckets())
+    #     return self.client.list_buckets()
 
-    def Create_Bucket(self,BucketName):
-        # 创建存储桶名字
-        BucketNmae=self.client.create_bucket(Bucket=BucketName)
-        return BucketNmae
-
-    def Serach_Bucket(self):
-        # 查询存储桶列表
-        print(self.client.list_buckets())
-        return self.client.list_buckets()
-
-    def Upload_File(self,filename = 'picture.jpg',filepath= './images/name1.jpg'):
-        self.client.upload_file(
-            Bucket='tazh-1257606718',
-            LocalFilePath=filepath,
-            Key=filename,
-            PartSize=1,
-            MAXThread=10,
-            EnableMD5=False
-        )
-        print('返回图片地址：'+'https://tazh-1257606718.cos.ap-chengdu.myqcloud.com/'+filename)
-        return 'https://tazh-1257606718.cos.ap-chengdu.myqcloud.com/'+filename
+    def Upload_File(self,filename,filepath):
+        data ={
+            'key':None,
+            'msg':None,
+            'rul':None,
+        }
+        bucket_name = 'familytang'
+        # 3600为token过期时间，秒为单位。3600等于一小时
+        token =self.q.upload_token(bucket_name, filename, 3600)
+        info = put_file(token, filename, filepath)
+        print(info[0])
+        print('返回图片地址：'+'http://qr0n4nltx.hn-bkt.clouddn.com/'+filename)
+        if(info[0]['key'] ==filename):
+            data['key']= filename
+            data['msg']= '上传成功'
+            data['url']= 'http://qr0n4nltx.hn-bkt.clouddn.com/'+filename
+            return data
+        else:
+            data['msg'] = '上传失败,请稍后重试'
+            return data
 
 if __name__ == '__main__':
     Result = Bucket_Handle()
