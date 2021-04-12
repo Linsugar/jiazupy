@@ -73,8 +73,8 @@ import os
 class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
     def list(self, request, *args, **kwargs):
-        user_id = request.data['user_id']
-        query = Dynamic_Image.objects.filter(user_id=user_id).all()
+        # user_id = request.data['user_id']
+        query = Dynamic_Image.objects.filter(user_id='307844349484234').all()
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -84,27 +84,31 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
-        filpath =request.FILES.get("image", None)
-        print(filpath)
-        path = default_storage.save('untils/somename.jpg', ContentFile(filpath.read()))
-        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-        print(tmp_file)
+        uplist = []
         new_filename = request.data['new_filename']
         up_title = request.data['up_title']
-        up_context=request.data['up_context']
-        up_addres= request.data['up_addres']
+        up_context = request.data['up_context']
+        up_addres = request.data['up_addres']
         user_id = request.data['user_id']
-        upResult = Bucket_Handle().Upload_File(filename=new_filename,filepath=tmp_file)
+        filpath =request.FILES.get("image", None)
+        filelist = request.FILES.getlist('image')
+        for ifile in filelist:
+            path = default_storage.save('untils/somename.jpg', ContentFile(ifile.read()))
+            tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+            upResult = Bucket_Handle().Upload_File(filename=new_filename, filepath=tmp_file)
+            uplist.append(upResult['url'])
+            print("===============================")
+            print(uplist)
         updata={
             'user_id':user_id,
             'Old_Imagename':str(filpath),
             'New_Imagename':str(new_filename),
-            'Up_ImageUrl':upResult['url'],
+            'Up_ImageUrl':str(uplist),
             'Up_Title':up_title,
             'Up_Context':up_context,
             'Up_addres':up_addres,
         }
+        print('listfanh'+str(uplist))
         serializer = self.get_serializer(data=updata)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

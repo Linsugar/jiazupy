@@ -47,7 +47,7 @@ class Dynamic_Image(models.Model):
     Up_Time = models.DateTimeField(auto_now=True)
     Old_Imagename = models.CharField(max_length=64)
     New_Imagename = models.CharField(max_length=64)
-    Up_ImageUrl = models.CharField(max_length=200)
+    Up_ImageUrl = models.TextField()
     Up_Context = models.CharField(max_length=200)
     Up_Title = models.CharField(max_length=64)
     Up_addres = models.CharField(max_length=16)
