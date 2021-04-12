@@ -1,5 +1,7 @@
 import random
 
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from rest_framework.response import Response
 
@@ -9,6 +11,9 @@ from app.Serialiaers.UserSerializers import User_Serializers,Image_Serializers
 from app.models import User, User_token, User_Image, Dynamic_Image
 from app.untils.Md5Catch import Power
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
+import csv
+
+from jiazu import settings
 
 
 class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
@@ -64,6 +69,7 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
         return Response(Rp)
 
 
+import os
 class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
     def list(self, request, *args, **kwargs):
@@ -78,15 +84,18 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        request.FILES.get("image", None)
-        filpath =  request.FILES.get("image", None)
-        tempFilePath = filpath.temporary_file_path()
+        print(request.data)
+        filpath =request.FILES.get("image", None)
+        print(filpath)
+        path = default_storage.save('untils/somename.jpg', ContentFile(filpath.read()))
+        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+        print(tmp_file)
         new_filename = request.data['new_filename']
         up_title = request.data['up_title']
         up_context=request.data['up_context']
         up_addres= request.data['up_addres']
         user_id = request.data['user_id']
-        upResult = Bucket_Handle().Upload_File(filename=new_filename,filepath=tempFilePath)
+        upResult = Bucket_Handle().Upload_File(filename=new_filename,filepath=tmp_file)
         updata={
             'user_id':user_id,
             'Old_Imagename':str(filpath),

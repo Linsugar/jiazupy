@@ -1,8 +1,7 @@
 # -*- coding=utf-8
 # appid 已在配置中移除,请在参数 Bucket 中带上 appid。Bucket 由 BucketName-APPID 组成
 # 1. 设置用户配置, 包括 secretId，secretKey 以及 Region
-from qcloud_cos import CosConfig
-from qcloud_cos import CosS3Client
+
 import sys
 import logging
 from qiniu import Auth, put_file, etag
@@ -45,4 +44,3 @@ class Bucket_Handle():  #存储桶操作
 
 if __name__ == '__main__':
     Result = Bucket_Handle()
-    Result.Upload_File()
