@@ -1,4 +1,5 @@
 import random
+import time
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -68,47 +69,63 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             Rp['coode'] = "2004"
         return Response(Rp)
 
-
+import json
 import os
 class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
     def list(self, request, *args, **kwargs):
-        # user_id = request.data['user_id']
-        query = Dynamic_Image.objects.filter(user_id='307844349484234').all()
-        queryset = self.filter_queryset(query)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        user_id = request.query_params.get('user_id',None)
+        if user_id is not None:
+            query = Dynamic_Image.objects.filter(user_id=user_id).all()
+            queryset = self.filter_queryset(query)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            query = Dynamic_Image.objects.filter(user_id=3078443494842346).all()
+            queryset = self.filter_queryset(query)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
+
 
     def create(self, request, *args, **kwargs):
         uplist = []
+
         new_filename = request.data['new_filename']
         up_title = request.data['up_title']
         up_context = request.data['up_context']
         up_addres = request.data['up_addres']
         user_id = request.data['user_id']
         filpath =request.FILES.get("image", None)
-        filelist = request.FILES.getlist('image')
+        print(filpath)
+        filelist = request.FILES.getlist("image")
         for ifile in filelist:
+            gettime = str(time.time())
+            sptime = gettime.split('.')
             path = default_storage.save('untils/somename.jpg', ContentFile(ifile.read()))
             tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-            upResult = Bucket_Handle().Upload_File(filename=new_filename, filepath=tmp_file)
-            uplist.append(upResult['url'])
+            upResult = Bucket_Handle().Upload_File(filename=sptime[0]+sptime[1]+".jpg", filepath=tmp_file)
+            uplist.append(upResult["url"])
             print("===============================")
             print(uplist)
+
         updata={
-            'user_id':user_id,
-            'Old_Imagename':str(filpath),
-            'New_Imagename':str(new_filename),
-            'Up_ImageUrl':str(uplist),
-            'Up_Title':up_title,
-            'Up_Context':up_context,
-            'Up_addres':up_addres,
+            "user_id":user_id,
+            "Old_Imagename":str(filpath),
+            "New_Imagename":str(new_filename),
+            "Up_ImageUrl":json.dumps(uplist),
+            "Up_Title":up_title,
+            "Up_Context":up_context,
+            "Up_addres":up_addres,
         }
-        print('listfanh'+str(uplist))
         serializer = self.get_serializer(data=updata)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

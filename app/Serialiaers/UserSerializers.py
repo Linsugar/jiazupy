@@ -1,5 +1,5 @@
 
-from rest_framework.serializers import ModelSerializer,ValidationError
+from rest_framework.serializers import ModelSerializer,ValidationError,JSONField
 import re
 from app.models import User, User_Image, Dynamic_Image
 
@@ -28,6 +28,7 @@ class Image_Serializers(ModelSerializer):
         print('发布动图：%s'%attrs)
         print("进入图片")
         return  attrs
+
 
     # def validate_user_id(self,value):
     #     if User.objects.filter(user_id=value).exists():

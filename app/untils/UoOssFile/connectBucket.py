@@ -4,6 +4,7 @@
 
 import sys
 import logging
+import time
 from qiniu import Auth, put_file, etag
 class Bucket_Handle():  #存储桶操作
     def __init__(self):
@@ -27,16 +28,18 @@ class Bucket_Handle():  #存储桶操作
             'msg':None,
             'rul':None,
         }
-        bucket_name = 'familytang'
+        bucket_name = "familytang"
         # 3600为token过期时间，秒为单位。3600等于一小时
         token =self.q.upload_token(bucket_name, filename, 3600)
         info = put_file(token, filename, filepath)
-        print(info[0])
-        print('返回图片地址：'+'http://qr0n4nltx.hn-bkt.clouddn.com/'+filename)
+        gettime = str(time.time())
+        sptime = gettime.split('.')
+
         if(info[0]['key'] ==filename):
+            print('得到的是：'+filename)
             data['key']= filename
-            data['msg']= '上传成功'
-            data['url']= 'http://qr0n4nltx.hn-bkt.clouddn.com/'+filename
+            data['msg']= "上传成功"
+            data["url"]= "http://qr0n4nltx.hn-bkt.clouddn.com/"+filename
             return data
         else:
             data['msg'] = '上传失败,请稍后重试'
