@@ -1,7 +1,7 @@
 
 from rest_framework.serializers import ModelSerializer,ValidationError,JSONField
 import re
-from app.models import User, User_Image, Dynamic_Image
+from app.models import User, User_Image, Dynamic_Image,feedback
 
 class User_Serializers(ModelSerializer):
     class Meta:
@@ -37,3 +37,12 @@ class Image_Serializers(ModelSerializer):
 
 
 
+class feedback_Serializers(ModelSerializer):
+    class Meta:
+        model = feedback
+        fields = "__all__"
+
+    def validate(self, attrs):
+        print('反馈：%s'%attrs)
+        print("反馈")
+        return attrs

@@ -52,4 +52,12 @@ class Dynamic_Image(models.Model):
     Up_Title = models.CharField(max_length=64)
     Up_addres = models.CharField(max_length=16)
 
+class feedback(models.Model):
+    feed_id = models.CharField(max_length=20)
+    feedback_context = models.TextField()
+    feedback_time = models.DateTimeField(auto_now=True)
+    # 反馈处理人
+    feedback_dealpeople = models.CharField(max_length=20,default='Tang')
+
+
 

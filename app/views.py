@@ -8,8 +8,8 @@ from rest_framework.response import Response
 
 from rest_framework.viewsets import GenericViewSet,generics
 from rest_framework import mixins, status
-from app.Serialiaers.UserSerializers import User_Serializers,Image_Serializers
-from app.models import User, User_token, User_Image, Dynamic_Image
+from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers
+from app.models import User, User_token, User_Image, Dynamic_Image,feedback
 from app.untils.Md5Catch import Power
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
 import csv
@@ -130,3 +130,23 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return JsonResponse(updata)
+
+class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    serializer_class = feedback_Serializers
+    def list(self, request, *args, **kwargs):
+        feed_id = request.query_params.get('feed_id',None)
+        obj = feedback.objects.filter(feed_id=feed_id).all()
+        queryset = self.filter_queryset(obj)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
