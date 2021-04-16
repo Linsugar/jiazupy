@@ -45,18 +45,19 @@ class MyThrottle(object):
 #自定义jwt认证
 class Jwt_Authentication(BaseJSONWebTokenAuthentication):
     def authenticate(self, request):
-        # print(request.method)
-        if request.method.lower()=='post':
-            return ('','')
+        print(request.method)
+        # if request.method.lower()=='post':
+        #     return ('','')
         """
         Returns a two-tuple of `User` and token if a valid signature has been
         supplied using JWT-based authentication.  Otherwise returns `None`.
         """
         jwt_value =request.META.get('HTTP_AUTHORIZATION')
-        token =self.leng_jwt(jwt_value)
         if jwt_value is None:
-            return None
+            raise AuthenticationFailed('非法用户')
+        token = self.leng_jwt(jwt_value)
         try:
+
             payload = jwt_decode_handler(token)
         except jwt.ExpiredSignature:
             raise AuthenticationFailed('已过期')
@@ -64,11 +65,12 @@ class Jwt_Authentication(BaseJSONWebTokenAuthentication):
             raise AuthenticationFailed('非法用户')
 
         user = self.authenticate_credentials(payload)
-        return (user, token)
+        return (user,token)
 
     def leng_jwt(self,jwt_value):
+
         jwt_list=jwt_value.split()
-        if len(jwt_list) !=3 or jwt_list[0].lower() !='jwt' or jwt_list[2].lower() !='auth':
+        if len(jwt_list) !=3 or jwt_list[0].lower() !='ak7' or jwt_list[2].lower() !='auth':
             return None
         #返回token
         return jwt_list[1]

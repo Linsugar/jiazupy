@@ -1,22 +1,38 @@
 
-from rest_framework.serializers import ModelSerializer,ValidationError,JSONField
+from rest_framework.serializers import ModelSerializer,ValidationError,JSONField,CharField
 import re
-from app.models import User, User_Image, Dynamic_Image,feedback
+
+from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
+
+from app.models import User, User_Image, Dynamic_Image,feedback,releasenew
 
 class User_Serializers(ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+    print('111')
 
     def validate(self, attrs):
         print("进入")
-        return  attrs
-    # def validate_user_pwd(self,value):
-    #     result = re.search('^[a-z][a-zA-Z0-9]{5,13}',str(value))
-    #     if result:
-    #        return value
-    #     raise ValidationError(detail='请以英文字母开头,并且密码长度不低于6位')
-    #
+        user_mobile=attrs.get('user_mobile')
+        password=attrs.get('password')
+        check_user=User.objects.filter(user_mobile=user_mobile)
+        user_obj=check_user.first()
+        if user_obj is not None:
+            if(User.objects.filter(user_mobile=user_mobile,password=password).exists()):
+                payload = jwt_payload_handler(user_obj)
+                self.token = jwt_encode_handler(payload)
+                print(self.token)
+                return attrs
+            else:
+                raise ValidationError(detail='密码不正确')
+        else:
+            self.create(attrs)
+            check_user = User.objects.filter(user_mobile=user_mobile)
+            user_obj = check_user.first()
+            payload = jwt_payload_handler(user_obj)
+            self.token = jwt_encode_handler(payload)
+            return attrs
 
 
 class Image_Serializers(ModelSerializer):
@@ -30,12 +46,6 @@ class Image_Serializers(ModelSerializer):
         return  attrs
 
 
-    # def validate_user_id(self,value):
-    #     if User.objects.filter(user_id=value).exists():
-    #         return value
-    #     raise ValidationError(detail="您的信息有误")
-
-
 
 class feedback_Serializers(ModelSerializer):
     class Meta:
@@ -45,4 +55,15 @@ class feedback_Serializers(ModelSerializer):
     def validate(self, attrs):
         print('反馈：%s'%attrs)
         print("反馈")
+        return attrs
+
+
+
+class release_Serializers(ModelSerializer):
+    class Meta:
+        model = releasenew
+        fields = "__all__"
+
+    def validate(self, attrs):
+        print("进入release")
         return attrs

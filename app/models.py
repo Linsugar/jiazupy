@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 # Create your models here.
@@ -5,17 +6,13 @@ from django.db import models
 
 # Create your models here.
 
-class User(models.Model):
+class User(AbstractUser):
     # 用户唯一id
     user_id = models.CharField(max_length=21,unique=True)
     # 用户头像
     avator_image =models.CharField(max_length=100)
     # 创建时ip地址
     create_ip = models.CharField(max_length=21)
-    # 用户名
-    user_name = models.CharField(max_length=8)
-    # 用户名密码
-    user_pwd = models.CharField(max_length=15)
     # 城市
     city  = models.CharField(max_length=16)
     # 邀请码
@@ -59,5 +56,14 @@ class feedback(models.Model):
     # 反馈处理人
     feedback_dealpeople = models.CharField(max_length=20,default='Tang')
 
+class releasenew(models.Model):
+    news_id = models.CharField(max_length=16)
+    news_title = models.CharField(max_length=64)
+    news_context = models.TextField()
+    news_url = models.URLField()
+    news_avatimage = models.URLField()
+    news_username = models.CharField(max_length=16)
+    user_id = models.CharField(max_length=32)
+    news_time = models.DateTimeField(auto_now=True)
 
 

@@ -106,6 +106,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication', # 先进行token认证
+        'rest_framework.authentication.SessionAuthentication', # 次要进行session认证
+        'rest_framework.authentication.BasicAuthentication', # 最后进行基本认证
+    ),
+}
+import datetime
+JWT_AUTH = {
+  # JWT_EXPIRATION_DELTA 指明token的有效期
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+}
+AUTH_USER_MODEL='app.User'
+
+APPEND_SLASH=False
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
