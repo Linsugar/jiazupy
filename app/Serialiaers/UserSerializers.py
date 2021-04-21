@@ -4,7 +4,7 @@ import re
 
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from app.models import User, User_Image, Dynamic_Image,feedback,releasenew
+from app.models import User, User_Image, Dynamic_Image,feedback,releasenew,User_token
 
 class User_Serializers(ModelSerializer):
     class Meta:
@@ -14,8 +14,8 @@ class User_Serializers(ModelSerializer):
 
     def validate(self, attrs):
         print("进入")
-        user_mobile=attrs.get('user_mobile')
-        password=attrs.get('password')
+        user_mobile=attrs.get('user_mobile',None)
+        password=attrs.get('password',None)
         check_user=User.objects.filter(user_mobile=user_mobile)
         user_obj=check_user.first()
         if user_obj is not None:
@@ -34,7 +34,14 @@ class User_Serializers(ModelSerializer):
             self.token = jwt_encode_handler(payload)
             return attrs
 
-
+class UserInfo_Serializers(ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+    print('111')
+    def validate(self, attrs):
+        print("1")
+        return  attrs
 class Image_Serializers(ModelSerializer):
     class Meta:
         model = Dynamic_Image
@@ -56,12 +63,15 @@ class feedback_Serializers(ModelSerializer):
         print('反馈：%s'%attrs)
         print("反馈")
         return attrs
-
+class roog_Serializers(ModelSerializer):
+    class Meta:
+        model = feedback
+        fields = "__all__"
 
 
 class release_Serializers(ModelSerializer):
     class Meta:
-        model = releasenew
+        model = User_token
         fields = "__all__"
 
     def validate(self, attrs):

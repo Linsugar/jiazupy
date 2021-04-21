@@ -9,10 +9,12 @@ import os
 from rest_framework.viewsets import GenericViewSet,generics
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
-from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers,release_Serializers
+from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers, \
+    release_Serializers, roog_Serializers, UserInfo_Serializers
 from app.models import User, User_token, User_Image, Dynamic_Image,feedback,releasenew
 from app.untils.Aut import Jwt_Authentication
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
+from app.untils.rongyun.roog import rongyun
 from jiazu import settings
 
 
@@ -30,6 +32,7 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
         return JsonResponse(serializer.data,safe=False)
 
     def create(self, request, *args, **kwargs):
+        rong = rongyun()
         oc = {
             "msg":None,
             "token": None,
@@ -46,15 +49,23 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
                 return JsonResponse(data={"msg":"密码或手机号有误"})
             payload = jwt_payload_handler(obj)
             self.token = jwt_encode_handler(payload)
+            roogtoken = rong.register_roog(name=obj1.username, user_id=obj1.user_id, portraitUri=obj1.avator_image)['token']
+            print('roottoken:'+roogtoken)
+            User_token.objects.update_or_create(
+                token_id=User.objects.filter(user_mobile=user_mobile).first(),
+                defaults={
+                    'user_token':roogtoken
+                })
             oc['token'] = self.token
             oc['msg'] = "登录成功"
             oc['avator_image'] = obj1.avator_image
             oc['user_id'] = obj1.user_id
+            oc['roogtoken'] = roogtoken
+
             return JsonResponse(oc)
         else:
             try:
                 filpath = request.FILES.get("avator_image", None)
-                print(filpath)
                 gettime = str(time.time())
                 sptime = gettime.split('.')
                 path = default_storage.save('untils/somename.jpg', ContentFile(filpath.read()))
@@ -74,14 +85,32 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
                 }
                 serializer = self.get_serializer(data=Redata)
                 serializer.is_valid(raise_exception=True)
+                roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=upResult["url"])['token']
+                User_token.objects.update_or_create(
+                    token_id=User.objects.filter(user_mobile=user_mobile).first(),
+                    user_token=roogtoken)
                 Redata["token"] = serializer.token
                 Redata["msg"] = "注册成功"
+                Redata["roogtoken"] =roogtoken
                 return JsonResponse(Redata)
             except Exception as e:
                 oc['msg']='不存在'
                 return JsonResponse(oc)
 
 
+class UserInfo(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
+    serializer_class = UserInfo_Serializers
+    def list(self, request, *args, **kwargs):
+        user_id=request.query_params.get("user_id")
+        quer = User.objects.exclude(user_id=user_id).all()
+        queryset = self.filter_queryset(quer)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 
@@ -108,8 +137,6 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
-
-
 
     def create(self, request, *args, **kwargs):
         uplist = []
@@ -188,3 +215,38 @@ class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+import hashlib
+class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    serializer_class = roog_Serializers
+    authentication_classes = [Jwt_Authentication]
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+
+        rongid = request.data.get("token_id")
+        rong = rongyun()
+        result = {
+            'msg': '获取成功',
+            'coode': '200',
+            'token': None
+        }
+        if User.objects.filter(user_id=rongid).exists():
+            roogtoken = rong.register_roog(user_id=rongid,)['token']
+            User_token.objects.update_or_create(
+                token_id=User.objects.filter(user_id=rongid).first(),
+                defaults={
+                    'user_token':roogtoken
+                })
+            result['token']=roogtoken
+            return JsonResponse(data=result,safe=False)
+        else:
+            result['coode'] = 400
+            result['token'] = ''
+            return JsonResponse(data=result, safe=False)
