@@ -37,7 +37,8 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             "msg":None,
             "token": None,
             "avaror_iamge":None,
-            "user_id":None
+            "user_id":None,
+            "user_name":None
         }
         userid = random.randint(1000000000,80000000000)
         user_mobile = request.data.get('user_mobile',None)
@@ -61,6 +62,7 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             oc['avator_image'] = obj1.avator_image
             oc['user_id'] = obj1.user_id
             oc['roogtoken'] = roogtoken
+            oc['user_name'] = obj1.username
 
             return JsonResponse(oc)
         else:
@@ -140,12 +142,13 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
 
     def create(self, request, *args, **kwargs):
         uplist = []
-
         new_filename = request.data['new_filename']
         up_title = request.data['up_title']
         up_context = request.data['up_context']
         up_addres = request.data['up_addres']
         user_id = request.data['user_id']
+        user_name = request.data['up_name']
+        up_avator = request.data['up_avator']
         filpath =request.FILES.get("image", None)
         print(filpath)
         filelist = request.FILES.getlist("image")
@@ -157,8 +160,6 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
             upResult = Bucket_Handle().Upload_File(filename=sptime[0]+sptime[1]+".jpg", filepath=tmp_file)
             uplist.append(upResult["url"])
             print("===============================")
-            print(uplist)
-
         updata={
             "user_id":user_id,
             "Old_Imagename":str(filpath),
@@ -167,11 +168,30 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
             "Up_Title":up_title,
             "Up_Context":up_context,
             "Up_addres":up_addres,
+            "Up_name":user_name,
+            "Up_avator":up_avator,
         }
         serializer = self.get_serializer(data=updata)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return JsonResponse(updata)
+
+# 获取所有动态
+class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    serializer_class = Image_Serializers
+    def list(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+        query = Dynamic_Image.objects.exclude(user_id=user_id).all()
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        pass
 
 class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = feedback_Serializers

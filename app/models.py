@@ -48,6 +48,8 @@ class Dynamic_Image(models.Model):
     Up_Context = models.CharField(max_length=200)
     Up_Title = models.CharField(max_length=64)
     Up_addres = models.CharField(max_length=16)
+    Up_name = models.CharField(max_length=16)
+    Up_avator= models.TextField()
 
 class feedback(models.Model):
     feed_id = models.CharField(max_length=20)
