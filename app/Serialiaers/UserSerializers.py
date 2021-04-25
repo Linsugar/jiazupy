@@ -4,7 +4,8 @@ import re
 
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from app.models import User, User_Image, Dynamic_Image,feedback,releasenew,User_token
+from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, weixinartic
+
 
 class User_Serializers(ModelSerializer):
     class Meta:
@@ -33,7 +34,6 @@ class User_Serializers(ModelSerializer):
             payload = jwt_payload_handler(user_obj)
             self.token = jwt_encode_handler(payload)
             return attrs
-
 class UserInfo_Serializers(ModelSerializer):
     class Meta:
         model = User
@@ -51,9 +51,6 @@ class Image_Serializers(ModelSerializer):
         print('发布动图：%s'%attrs)
         print("进入图片")
         return  attrs
-
-
-
 class feedback_Serializers(ModelSerializer):
     class Meta:
         model = feedback
@@ -67,8 +64,6 @@ class roog_Serializers(ModelSerializer):
     class Meta:
         model = feedback
         fields = "__all__"
-
-
 class release_Serializers(ModelSerializer):
     class Meta:
         model = User_token
@@ -76,4 +71,13 @@ class release_Serializers(ModelSerializer):
 
     def validate(self, attrs):
         print("进入release")
+        return attrs
+
+class wx_Serializers(ModelSerializer):
+    class Meta:
+        model=weixinartic
+        fields = '__all__'
+
+    def validate(self, attrs):
+        print("进去")
         return attrs

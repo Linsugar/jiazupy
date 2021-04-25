@@ -68,4 +68,17 @@ class releasenew(models.Model):
     user_id = models.CharField(max_length=32)
     news_time = models.DateTimeField(auto_now=True)
 
-
+class weixinartic(models.Model):
+    ClsChoice=(
+        (1,'宠物'),
+        (2,'旅游'),
+        (3,'电竞'),
+        (4,'汽车'),
+        (5,'搞笑')
+    )
+    wxurl=models.TextField()
+    wxtitle = models.CharField(max_length=16)
+    wximage = models.TextField()
+    wxuserid=models.CharField(max_length=26)
+    wxtime=models.DateTimeField(auto_now=True)
+    wxclass=models.IntegerField(choices=ClsChoice,default=1)

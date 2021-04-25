@@ -10,8 +10,8 @@ from rest_framework.viewsets import GenericViewSet,generics
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers, \
-    release_Serializers, roog_Serializers, UserInfo_Serializers
-from app.models import User, User_token, User_Image, Dynamic_Image,feedback,releasenew
+    release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers
+from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic
 from app.untils.Aut import Jwt_Authentication
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
 from app.untils.rongyun.roog import rongyun
@@ -236,7 +236,6 @@ class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-import hashlib
 class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = roog_Serializers
     authentication_classes = [Jwt_Authentication]
@@ -270,3 +269,24 @@ class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             result['coode'] = 400
             result['token'] = ''
             return JsonResponse(data=result, safe=False)
+
+
+class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    serializer_class = wx_Serializers
+    def list(self, request, *args, **kwargs):
+        wxclass = request.query_params.get('wxclass')
+        query = weixinartic.objects.filter(wxclass=wxclass).all()
+        queryset = self.filter_queryset(queryset=query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return JsonResponse(serializer.data,safe=False)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
