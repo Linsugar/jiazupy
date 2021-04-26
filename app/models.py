@@ -82,3 +82,22 @@ class weixinartic(models.Model):
     wxuserid=models.CharField(max_length=26)
     wxtime=models.DateTimeField(auto_now=True)
     wxclass=models.IntegerField(choices=ClsChoice,default=1)
+
+class sendtask(models.Model):
+    ClsChoice = (
+        (1, '初级任务'),
+        (2, '中级任务'),
+        (3, '高级任务'),
+    )
+    # 任务分类
+    taskcls = models.IntegerField(choices=ClsChoice,default=1)
+    tasktime = models.DateTimeField(auto_now=True)
+    tasktitle= models.CharField(max_length=16)
+    taskcontent = models.TextField()
+    # 领取状态
+    taststatue = models.IntegerField(default=1)
+    # 领取人id
+    taskid = models.CharField(max_length=64)
+    # 发布任务id
+    tasksendid = models.CharField(max_length=64,default='23607016397')
+    tasksendname = models.CharField(max_length=64,default='管理员')

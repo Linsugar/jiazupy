@@ -11,12 +11,11 @@ from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers, \
     release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers
-from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic
+from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask
 from app.untils.Aut import Jwt_Authentication
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
 from app.untils.rongyun.roog import rongyun
 from jiazu import settings
-
 
 class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializer_class = User_Serializers
@@ -98,8 +97,6 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             except Exception as e:
                 oc['msg']='不存在'
                 return JsonResponse(oc)
-
-
 class UserInfo(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializer_class = UserInfo_Serializers
     def list(self, request, *args, **kwargs):
@@ -113,9 +110,6 @@ class UserInfo(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-
-
 class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
     authentication_classes = [Jwt_Authentication]
@@ -175,7 +169,6 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return JsonResponse(updata)
-
 # 获取所有动态
 class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
@@ -213,7 +206,6 @@ class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
 class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = release_Serializers
@@ -270,7 +262,6 @@ class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             result['token'] = ''
             return JsonResponse(data=result, safe=False)
 
-
 class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = wx_Serializers
     def list(self, request, *args, **kwargs):
@@ -290,3 +281,18 @@ class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class SendTaskView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    def list(self, request, *args, **kwargs):
+        taskcls = request.query_params.get('taskcls')
+        taststatue = request.query_params.get('taststatue')
+        query = sendtask.objects.filter(taskcls=taskcls,taststatue=taststatue).all()
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return JsonResponse(serializer.data,safe=False)
+    def create(self, request, *args, **kwargs):
+        pass

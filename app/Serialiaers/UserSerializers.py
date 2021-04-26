@@ -4,7 +4,7 @@ import re
 
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, weixinartic
+from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, weixinartic, sendtask
 
 
 class User_Serializers(ModelSerializer):
@@ -78,6 +78,14 @@ class wx_Serializers(ModelSerializer):
         model=weixinartic
         fields = '__all__'
 
+    def validate(self, attrs):
+        print("进去")
+        return attrs
+
+class SendTask_Serializers(ModelSerializer):
+    class Meta:
+        model = sendtask
+        fields = '__all__'
     def validate(self, attrs):
         print("进去")
         return attrs
