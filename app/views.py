@@ -265,8 +265,7 @@ class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = wx_Serializers
     def list(self, request, *args, **kwargs):
-        wxclass = request.query_params.get('wxclass')
-        query = weixinartic.objects.filter(wxclass=wxclass).all()
+        query = weixinartic.objects.all()
         queryset = self.filter_queryset(queryset=query)
         page = self.paginate_queryset(queryset)
         if page is not None:
