@@ -91,13 +91,17 @@ class sendtask(models.Model):
     )
     # 任务分类
     taskcls = models.IntegerField(choices=ClsChoice,default=1)
+    # 任务发布时间
     tasktime = models.DateTimeField(auto_now=True)
+    # 任务标题
     tasktitle= models.CharField(max_length=16)
+    # 任务内容
     taskcontent = models.TextField()
     # 领取状态
     taststatue = models.IntegerField(default=1)
     # 领取人id
-    taskid = models.CharField(max_length=64)
+    taskid = models.CharField(max_length=64,null=True)
     # 发布任务id
     tasksendid = models.CharField(max_length=64,default='23607016397')
+    #发布任务人名称
     tasksendname = models.CharField(max_length=64,default='管理员')

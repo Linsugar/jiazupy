@@ -10,7 +10,7 @@ from rest_framework.viewsets import GenericViewSet,generics
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers, \
-    release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers
+    release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers
 from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask
 from app.untils.Aut import Jwt_Authentication
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
@@ -281,7 +281,9 @@ class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+# 发布任务
 class SendTaskView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    serializer_class = SendTask_Serializers
     def list(self, request, *args, **kwargs):
         taskcls = request.query_params.get('taskcls')
         taststatue = request.query_params.get('taststatue')
@@ -294,4 +296,7 @@ class SendTaskView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         serializer = self.get_serializer(queryset, many=True)
         return JsonResponse(serializer.data,safe=False)
     def create(self, request, *args, **kwargs):
-        pass
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED,safe=False)

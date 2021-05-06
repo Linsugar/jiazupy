@@ -79,7 +79,7 @@ class wx_Serializers(ModelSerializer):
         fields = '__all__'
 
     def validate(self, attrs):
-        print("进去")
+        print("进去wx_Serializers")
         return attrs
 
 class SendTask_Serializers(ModelSerializer):
@@ -87,5 +87,5 @@ class SendTask_Serializers(ModelSerializer):
         model = sendtask
         fields = '__all__'
     def validate(self, attrs):
-        print("进去")
+        print("进去SendTask_Serializers")
         return attrs
