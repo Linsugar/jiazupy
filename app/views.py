@@ -296,7 +296,17 @@ class SendTaskView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         serializer = self.get_serializer(queryset, many=True)
         return JsonResponse(serializer.data,safe=False)
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        task = random.randint(100000000,300000000)
+        data = {
+            'task':task,
+            'tasksendid':request.data.get('tasksendid'),
+            'tasksendname':request.data.get('tasksendname'),
+            'taststatue':request.data.get('taststatue'),
+            'taskcls':request.data.get('taskcls'),
+            'taskcontent':request.data.get('taskcontent'),
+            'tasktitle':request.data.get('tasktitle'),
+        }
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED,safe=False)
@@ -305,7 +315,6 @@ class TaskOnly(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = SendTask_Serializers
     def list(self, request, *args, **kwargs):
         taskid = request.query_params.get('taskid')
-        print('sss'+str(taskid))
         taststatue = request.query_params.get('taststatue')
         if(taststatue == ''):
             query = sendtask.objects.filter(taskid=taskid).exclude(taststatue=1).all()
@@ -325,6 +334,15 @@ class TaskOnly(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
             return JsonResponse(serializer.data,safe=False)
-
+    # 领取任务
     def create(self, request, *args, **kwargs):
-        pass
+        taskid = request.data.get("taskid")
+        task = request.data.get("task")
+        taststatue = request.data.get("taststatue")
+        rs = sendtask.objects.filter(task=task).update(taststatue=taststatue, taskid=taskid)
+        print(rs)
+        result = {
+            'msg':'更新成功',
+            'statue':201
+        }
+        return JsonResponse(result,status=status.HTTP_201_CREATED,safe=False)

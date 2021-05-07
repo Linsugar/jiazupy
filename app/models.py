@@ -89,6 +89,8 @@ class sendtask(models.Model):
         (2, '中级任务'),
         (3, '高级任务'),
     )
+    #任务Id
+    task = models.CharField(max_length=16)
     # 任务分类
     taskcls = models.IntegerField(choices=ClsChoice,default=1)
     # 任务发布时间
