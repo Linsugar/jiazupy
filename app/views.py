@@ -300,3 +300,31 @@ class SendTaskView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED,safe=False)
+# 领取任务记录
+class TaskOnly(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    serializer_class = SendTask_Serializers
+    def list(self, request, *args, **kwargs):
+        taskid = request.query_params.get('taskid')
+        print('sss'+str(taskid))
+        taststatue = request.query_params.get('taststatue')
+        if(taststatue == ''):
+            query = sendtask.objects.filter(taskid=taskid).exclude(taststatue=1).all()
+            queryset = self.filter_queryset(query)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            query = sendtask.objects.filter(taskid=taskid,taststatue=taststatue).all()
+            queryset = self.filter_queryset(query)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return JsonResponse(serializer.data,safe=False)
+
+    def create(self, request, *args, **kwargs):
+        pass
