@@ -4,7 +4,8 @@ import re
 
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, weixinartic, sendtask
+from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, weixinartic, sendtask, \
+    Dynamic_review
 
 
 class User_Serializers(ModelSerializer):
@@ -90,10 +91,10 @@ class SendTask_Serializers(ModelSerializer):
         print("进去SendTask_Serializers")
         return attrs
 
-# class review_Serializers(ModelSerializer):
-#     class Meta:
-#         model = Dynamic_review
-#         fields = '__all__'
-#     def validate(self, attrs):
-#         print("进去review_Serializers")
-#         return attrs
+class review_Serializers(ModelSerializer):
+    class Meta:
+        model = Dynamic_review
+        fields = '__all__'
+    def validate(self, attrs):
+        print("进去review_Serializers")
+        return attrs

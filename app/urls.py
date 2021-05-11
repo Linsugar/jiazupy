@@ -15,6 +15,7 @@ rou.register(viewset=views.DynamicAll,prefix='dynamicall',basename="获取所有
 rou.register(viewset=views.Wxarticle,prefix='wxarticle',basename="获取所有的微信文章")
 rou.register(viewset=views.SendTaskView,prefix='sendtask',basename="发布任务")
 rou.register(viewset=views.TaskOnly,prefix='taskonly',basename="任务记录")
+rou.register(viewset=views.DynamicRevicew,prefix='review',basename="动态评论")
 urlpatterns = [
     path('',include(rou.urls))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -10,8 +10,10 @@ from rest_framework.viewsets import GenericViewSet,generics
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers, \
-    release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers
-from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask
+    release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers, \
+    review_Serializers
+from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
+    Dynamic_review
 from app.untils.Aut import Jwt_Authentication
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
 from app.untils.rongyun.roog import rongyun
@@ -187,7 +189,24 @@ class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 
 # 动态评论
 class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
-    pass
+    serializer_class = review_Serializers
+    def list(self, request, *args, **kwargs):
+        query = Dynamic_review.objects.filter(review_id=request.query_params.get("review_id")).all()
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return JsonResponse(serializer.data,safe=False)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = feedback_Serializers
