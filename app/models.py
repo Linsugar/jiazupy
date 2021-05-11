@@ -51,6 +51,16 @@ class Dynamic_Image(models.Model):
     Up_name = models.CharField(max_length=16)
     Up_avator= models.TextField()
 
+# 动态评论
+class Dynamic_review(models.Model):
+    review_id = models.IntegerField(unique=True,default=1)
+    recview_avator = models.TextField()
+    review_content = models.CharField(max_length=64)
+    review_name = models.CharField(max_length=16)
+    review_time = models.DateTimeField(auto_now=True)
+    review_bool = models.IntegerField(default=0)
+
+# 反馈
 class feedback(models.Model):
     feed_id = models.CharField(max_length=20)
     feedback_context = models.TextField()

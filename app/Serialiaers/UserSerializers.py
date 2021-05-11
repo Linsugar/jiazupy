@@ -89,3 +89,11 @@ class SendTask_Serializers(ModelSerializer):
     def validate(self, attrs):
         print("进去SendTask_Serializers")
         return attrs
+
+# class review_Serializers(ModelSerializer):
+#     class Meta:
+#         model = Dynamic_review
+#         fields = '__all__'
+#     def validate(self, attrs):
+#         print("进去review_Serializers")
+#         return attrs

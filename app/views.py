@@ -133,7 +133,6 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
-
     def create(self, request, *args, **kwargs):
         uplist = []
         new_filename = request.data['new_filename']
@@ -185,6 +184,10 @@ class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 
     def create(self, request, *args, **kwargs):
         pass
+
+# 动态评论
+class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    pass
 
 class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = feedback_Serializers
