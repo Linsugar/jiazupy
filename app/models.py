@@ -53,7 +53,7 @@ class Dynamic_Image(models.Model):
 
 # 动态评论
 class Dynamic_review(models.Model):
-    review_id = models.IntegerField(unique=True,default=1)
+    review_rd = models.IntegerField(default=1)
     recview_avator = models.TextField()
     review_content = models.CharField(max_length=64)
     review_name = models.CharField(max_length=16)

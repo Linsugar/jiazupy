@@ -191,7 +191,7 @@ class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = review_Serializers
     def list(self, request, *args, **kwargs):
-        query = Dynamic_review.objects.filter(review_id=request.query_params.get("review_id")).all()
+        query = Dynamic_review.objects.filter(review_rd=request.query_params.get("review_rd")).all()
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
         if page is not None:
