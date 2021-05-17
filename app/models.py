@@ -117,3 +117,27 @@ class sendtask(models.Model):
     tasksendid = models.CharField(max_length=64,default='23607016397')
     #发布任务人名称
     tasksendname = models.CharField(max_length=64,default='管理员')
+
+
+"""
+Team_uid:团队唯一id,Team_name:团队名字,Team_init:团队创始人,
+Team_Type:团队类型,Team_Size:团队规模,Team_Rank:团队等级,
+Team_Cover:团队封面,Team_Introduction:团队介绍,Team_City:团队可加入城市,
+Team_Score:团队可加入积分,Team_sex:团队可加入性别,Team_time:团队创建时间,
+Team_Dismissaltime：团队解散时间
+"""
+class Teams(models.Model):
+    Team_uid = models.CharField(max_length=64,unique=True)#团队唯一id
+    Team_name =models.CharField(max_length=16) #团队名字
+    Team_init = models.CharField(max_length=32)#团队创始人
+    Team_Type = models.CharField(max_length=16)#团队类型
+    Team_Size = models.IntegerField()#团队规模
+    Team_Rank = models.IntegerField(default=1)#团队等级
+    Team_Cover = models.TextField()#团队封面
+    Team_Introduction = models.TextField(max_length=64,null=True)#团队介绍
+    Team_City = models.CharField(max_length=10,null=True)#团队可加入城市
+    Team_Score = models.IntegerField(null=True)#团队可加入积分
+    Team_sex = models.IntegerField(null=True)#团队可加入性别
+    Team_time = models.DateTimeField(auto_now=True)#团队创建时间
+    Team_Dismissaltime = models.DateTimeField(null=True)#团队解散时间
+

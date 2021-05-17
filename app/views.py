@@ -11,7 +11,7 @@ from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers, \
     release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers, \
-    review_Serializers
+    review_Serializers, teams_Serializers
 from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
     Dynamic_review
 from app.untils.Aut import Jwt_Authentication
@@ -368,3 +368,28 @@ class TaskOnly(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             'statue':201
         }
         return JsonResponse(result,status=status.HTTP_201_CREATED,safe=False)
+
+
+"""
+团队管理,创建团队，查询团队
+"""
+class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    serializer_class = teams_Serializers
+    def create(self, request, *args, **kwargs):
+        teamuid = random.randint(100000000000,900000000000)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
