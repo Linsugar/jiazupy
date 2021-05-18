@@ -387,6 +387,7 @@ class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             upResult = Bucket_Handle().Upload_File(filename=sptime[0] + sptime[1] + ".jpg", filepath=tmp_file)
             Team_Cover.append(upResult["url"])
             print("===============================")
+        #     团队管理请求
         data={
             'Team_uid':teamuid,
             'Team_name':request.data.get('Team_name'),
