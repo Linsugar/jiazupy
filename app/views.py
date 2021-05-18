@@ -377,7 +377,30 @@ class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = teams_Serializers
     def create(self, request, *args, **kwargs):
         teamuid = random.randint(100000000000,900000000000)
-        serializer = self.get_serializer(data=request.data)
+        Team_Cover= []
+        filelist = request.FILES.getlist("Team_Cover")
+        for ifile in filelist:
+            gettime = str(time.time())
+            sptime = gettime.split('.')
+            path = default_storage.save('untils/somename.jpg', ContentFile(ifile.read()))
+            tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+            upResult = Bucket_Handle().Upload_File(filename=sptime[0] + sptime[1] + ".jpg", filepath=tmp_file)
+            Team_Cover.append(upResult["url"])
+            print("===============================")
+        data={
+            'Team_uid':teamuid,
+            'Team_name':request.data.get('Team_name'),
+            'Team_init':request.data.get('Team_init'),
+            'Team_Type':request.data.get('Team_Type'),
+            'Team_Size':request.data.get('Team_Size'),
+            'Team_Cover':json.dumps(Team_Cover),
+            'Team_Introduction':request.data.get('Team_Introduction'),
+            'Team_City':request.data.get('Team_City'),
+            'Team_Score':request.data.get('Team_Score'),
+            'Team_sex':request.data.get('Team_sex'),
+            'Team_Dismissaltime':request.data.get('Team_Dismissaltime'),
+        }
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
