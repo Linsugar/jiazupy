@@ -136,6 +136,7 @@ class Teams(models.Model):
     Team_Cover = models.TextField()#团队封面
     Team_Introduction = models.TextField(max_length=64,null=True)#团队介绍
     Team_City = models.CharField(max_length=10,null=True)#团队可加入城市
+
     Team_Score = models.IntegerField(null=True)#团队可加入积分
     Team_sex = models.IntegerField(null=True)#团队可加入性别
     Team_time = models.DateTimeField(auto_now=True)#团队创建时间
