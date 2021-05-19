@@ -13,7 +13,7 @@ from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers,
     release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers, \
     review_Serializers, teams_Serializers
 from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
-    Dynamic_review
+    Dynamic_review, Teams
 from app.untils.Aut import Jwt_Authentication
 from app.untils.UoOssFile.connectBucket import Bucket_Handle
 from app.untils.rongyun.roog import rongyun
@@ -64,7 +64,6 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             oc['user_id'] = obj1.user_id
             oc['roogtoken'] = roogtoken
             oc['user_name'] = obj1.username
-
             return JsonResponse(oc)
         else:
             try:
@@ -84,6 +83,7 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
                     'username': request.data['username'],
                     'avator_image': upResult["url"],
                     'city': request.data['city'],
+                    'user_sex': request.data['user_sex'],
                     'create_ip': request.META.get("REMOTE_ADDR"),
                 }
                 serializer = self.get_serializer(data=Redata)
@@ -375,6 +375,7 @@ class TaskOnly(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 """
 class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = teams_Serializers
+    queryset = Teams.objects.all()
     def create(self, request, *args, **kwargs):
         teamuid = random.randint(100000000000,900000000000)
         Team_Cover= []
@@ -392,12 +393,14 @@ class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             'Team_uid':teamuid,
             'Team_name':request.data.get('Team_name'),
             'Team_init':request.data.get('Team_init'),
+            'Team_initid':request.data.get('Team_initid'),
             'Team_Type':request.data.get('Team_Type'),
             'Team_Size':request.data.get('Team_Size'),
             'Team_Cover':json.dumps(Team_Cover),
             'Team_Introduction':request.data.get('Team_Introduction'),
             'Team_City':request.data.get('Team_City'),
             'Team_Score':request.data.get('Team_Score'),
+            'Team_level':request.data.get('Team_level'),
             'Team_sex':request.data.get('Team_sex'),
             'Team_Dismissaltime':request.data.get('Team_Dismissaltime'),
         }
@@ -406,14 +409,11 @@ class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return JsonResponse(serializer.data,safe=False)
-
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

@@ -29,6 +29,14 @@ class User(AbstractUser):
     platform =models.CharField(max_length=15)
     # 最后登录时间
     last_login = models.DateTimeField(auto_now=True)
+    #用户加入的团队
+    user_team = models.CharField(max_length=64,null=True)
+    #用户积分
+    user_score = models.IntegerField(default=0)
+    # 用户等级
+    user_level = models.IntegerField(default=0)
+    #用户性别
+    user_sex = models.CharField(max_length=12)
 
 class User_token(models.Model):
     token_id = models.OneToOneField(to=User,on_delete=models.CASCADE,unique=True)
@@ -130,15 +138,16 @@ class Teams(models.Model):
     Team_uid = models.CharField(max_length=64,unique=True)#团队唯一id
     Team_name =models.CharField(max_length=16) #团队名字
     Team_init = models.CharField(max_length=32)#团队创始人
+    Team_initid = models.CharField(max_length=64)#团队创始人id
     Team_Type = models.CharField(max_length=16)#团队类型
     Team_Size = models.IntegerField()#团队规模
-    Team_Rank = models.IntegerField(default=1)#团队等级
+    Team_Rank = models.IntegerField(default=1)#当前团队等级
     Team_Cover = models.TextField()#团队封面
     Team_Introduction = models.TextField(max_length=64,null=True)#团队介绍
     Team_City = models.CharField(max_length=10,null=True)#团队可加入城市
-
+    Team_level = models.IntegerField(default=0)#团队可加入等级
     Team_Score = models.IntegerField(null=True)#团队可加入积分
-    Team_sex = models.IntegerField(null=True)#团队可加入性别
+    Team_sex = models.CharField(null=True,max_length=12)#团队可加入性别
     Team_time = models.DateTimeField(auto_now=True)#团队创建时间
     Team_Dismissaltime = models.DateTimeField(null=True)#团队解散时间
 
