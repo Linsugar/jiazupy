@@ -174,8 +174,7 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
 class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
     def list(self, request, *args, **kwargs):
-        user_id = request.query_params.get('user_id')
-        query = Dynamic_Image.objects.exclude(user_id=user_id).all()
+        query = Dynamic_Image.objects.all()
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
         if page is not None:
