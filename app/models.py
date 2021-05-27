@@ -151,3 +151,12 @@ class Teams(models.Model):
     Team_time = models.DateTimeField(auto_now=True)#团队创建时间
     Team_Dismissaltime = models.DateTimeField(null=True)#团队解散时间
 
+class Videosmodel(models.Model):
+    video_Title = models.CharField(max_length=16)
+    video_Time = models.DateTimeField(auto_now=True)
+    video_context = models.TextField()
+    video_upusername = models.CharField(max_length=16)
+    video_upuserid = models.CharField(max_length=64)
+    video_url = models.TextField()
+    video_cover = models.TextField()
+
