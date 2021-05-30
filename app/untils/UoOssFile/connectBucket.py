@@ -28,7 +28,7 @@ class Bucket_Handle():  #存储桶操作
             'msg':None,
             'rul':None,
         }
-        bucket_name = "linlintang"
+        bucket_name = "tangdynamic"
         # 3600为token过期时间，秒为单位。3600等于一小时
         token =self.q.upload_token(bucket_name, filename, 3600)
         info = put_file(token, filename, filepath)
@@ -39,7 +39,7 @@ class Bucket_Handle():  #存储桶操作
             print('得到的是：'+filename)
             data['key']= filename
             data['msg']= "上传成功"
-            data["url"]= "http://qsd5qi1yj.bkt.clouddn.com/"+filename
+            data["url"]= "http://qtwribo4e.hn-bkt.clouddn.com/"+filename
             return data
         else:
             data['msg'] = '上传失败,请稍后重试'

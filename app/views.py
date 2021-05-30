@@ -9,9 +9,9 @@ import os
 from rest_framework.viewsets import GenericViewSet,generics
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
-from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, feedback_Serializers, \
+from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, \
     release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers, \
-    review_Serializers, teams_Serializers, video_Serializers
+    review_Serializers, teams_Serializers, video_Serializers, feedback_Serializers
 from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
     Dynamic_review, Teams, Videosmodel
 from app.untils.Aut import Jwt_Authentication
