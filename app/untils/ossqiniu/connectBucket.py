@@ -1,7 +1,6 @@
 # -*- coding=utf-8
 # appid 已在配置中移除,请在参数 Bucket 中带上 appid。Bucket 由 BucketName-APPID 组成
 # 1. 设置用户配置, 包括 secretId，secretKey 以及 Region
-
 import sys
 import logging
 import time
@@ -28,22 +27,24 @@ class Bucket_Handle():  #存储桶操作
             'msg':None,
             'rul':None,
         }
-        bucket_name = "tangdynamic"
+        bucket_name = "tanghuadong"
         # 3600为token过期时间，秒为单位。3600等于一小时
         token =self.q.upload_token(bucket_name, filename, 3600)
         info = put_file(token, filename, filepath)
-        gettime = str(time.time())
-        sptime = gettime.split('.')
-
         if(info[0]['key'] ==filename):
             print('得到的是：'+filename)
             data['key']= filename
             data['msg']= "上传成功"
-            data["url"]= "http://qtwribo4e.hn-bkt.clouddn.com/"+filename
+            data["url"]= "http://qw4kwhslj.hd-bkt.clouddn.com/"+filename
             return data
         else:
             data['msg'] = '上传失败,请稍后重试'
             return data
-
+    def upToken(self):
+        bucket_name = "tanghuadong"
+        # 3600为token过期时间，秒为单位。3600等于一小时
+        token =self.q.upload_token(bucket_name)
+        print(token)
+        return token
 if __name__ == '__main__':
     Result = Bucket_Handle()

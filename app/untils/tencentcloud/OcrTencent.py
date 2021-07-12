@@ -5,7 +5,6 @@ from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.ocr.v20181119 import ocr_client, models
 
-
 SecretId = 'AKID3sRM3U4bkeQwSajT4YoqnVgdOsUhdQsn'
 SecretKey = 'oOhldGdNwoTs0tWtSl5B1cY5MRFn57tV'
 try:

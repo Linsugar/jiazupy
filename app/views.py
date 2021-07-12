@@ -6,16 +6,16 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 import json
 import os
-from rest_framework.viewsets import GenericViewSet,generics
+from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, \
     release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers, \
     review_Serializers, teams_Serializers, video_Serializers, feedback_Serializers
-from app.models import User, User_token, User_Image, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
+from app.models import User, User_token, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
     Dynamic_review, Teams, Videosmodel
 from app.untils.Aut import Jwt_Authentication
-from app.untils.UoOssFile.connectBucket import Bucket_Handle
+from app.untils.ossqiniu.connectBucket import Bucket_Handle
 from app.untils.rongyun.roog import rongyun
 from jiazu import settings
 
@@ -406,7 +406,6 @@ class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
         return JsonResponse(serializer.data,safe=False)
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -434,3 +433,10 @@ class Videos(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+# 返回七牛云token
+class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    authentication_classes = [Jwt_Authentication]
+    def create(self, request, *args, **kwargs):
+        QiuToken = Bucket_Handle().upToken()
+        return Response(QiuToken)

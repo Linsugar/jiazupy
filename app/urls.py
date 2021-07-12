@@ -18,6 +18,7 @@ rou.register(viewset=views.TaskOnly,prefix='taskonly',basename="任务记录")
 rou.register(viewset=views.DynamicRevicew,prefix='review',basename="动态评论")
 rou.register(viewset=views.Team_Manger,prefix='team',basename="团队管理")
 rou.register(viewset=views.Videos,prefix='video',basename="视频管理")
+rou.register(viewset=views.GetQiNiuToken,prefix='qiniu',basename="视频管理")
 urlpatterns = [
     path('',include(rou.urls))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
