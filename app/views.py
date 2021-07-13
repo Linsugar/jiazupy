@@ -435,8 +435,16 @@ class Videos(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 # 返回七牛云token
+import requests
 class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
     def create(self, request, *args, **kwargs):
         QiuToken = Bucket_Handle().upToken()
         return Response(QiuToken)
+
+    def list(self, request, *args, **kwargs):
+        appid ='wx50f04c5bde8f1938'
+        secret = '6c66e73ab589817d7b5b98810ddc4b73'
+        url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'%(appid,secret)
+        result = requests.get(url)
+        return Response(result)

@@ -27,3 +27,11 @@
 # # print(rs['token'])
 
 
+inputValue = input("请输入内容：")
+
+print(type(inputValue))
+# 判断是否全字母符串
+res  = inputValue.isalpha()
+#判断是否
+print(res)
+
