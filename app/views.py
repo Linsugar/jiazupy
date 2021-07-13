@@ -144,6 +144,7 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         user_id = request.data['user_id']
         user_name = request.data['up_name']
         up_avator = request.data['up_avator']
+        print(request.data['image'])
         filpath =request.FILES.get("image", None)
         print(filpath)
         filelist = request.FILES.getlist("image")
@@ -172,6 +173,7 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         return JsonResponse(updata)
 # 获取所有动态
 class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    authentication_classes = [Jwt_Authentication]
     serializer_class = Image_Serializers
     def list(self, request, *args, **kwargs):
         query = Dynamic_Image.objects.all()
@@ -188,6 +190,7 @@ class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 
 # 动态评论
 class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    authentication_classes = [Jwt_Authentication]
     serializer_class = review_Serializers
     def list(self, request, *args, **kwargs):
         query = Dynamic_review.objects.filter(review_rd=request.query_params.get("review_rd")).all()
@@ -230,7 +233,7 @@ class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 
 class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = release_Serializers
-
+    authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         obj = releasenew.objects.all()
         queryset = self.filter_queryset(obj)
@@ -285,6 +288,7 @@ class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 
 class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = wx_Serializers
+    authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         query = weixinartic.objects.all()
         queryset = self.filter_queryset(queryset=query)
@@ -305,6 +309,7 @@ class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 # 发布任务
 class SendTaskView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = SendTask_Serializers
+    authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         taskcls = request.query_params.get('taskcls')
         taststatue = request.query_params.get('taststatue')
@@ -334,6 +339,7 @@ class SendTaskView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
 # 领取任务记录
 class TaskOnly(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = SendTask_Serializers
+    authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         taskid = request.query_params.get('taskid')
         taststatue = request.query_params.get('taststatue')
@@ -374,6 +380,7 @@ class TaskOnly(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 """
 class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = teams_Serializers
+    authentication_classes = [Jwt_Authentication]
     queryset = Teams.objects.all()
     def create(self, request, *args, **kwargs):
         teamuid = random.randint(100000000000,900000000000)
@@ -419,6 +426,7 @@ class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 class Videos(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = video_Serializers
     queryset = Videosmodel.objects.all()
+    authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
@@ -436,6 +444,7 @@ class Videos(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 
 # 返回七牛云token
 import requests
+import json
 class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
     def create(self, request, *args, **kwargs):
@@ -444,7 +453,19 @@ class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin
 
     def list(self, request, *args, **kwargs):
         appid ='wx50f04c5bde8f1938'
-        secret = '6c66e73ab589817d7b5b98810ddc4b73'
+        secret = '784069c669fd121a564a836dae2f1d8b'
         url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'%(appid,secret)
         result = requests.get(url)
+        rs = json.loads(result.content)
+        print(rs['access_token'])
+        headers = {'Content-Type': 'application/json'}
+        tokenurl = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token='+rs['access_token']
+        data = {
+            "type": "news",
+            "offset": 0,
+            "count": 20
+        }
+        tilte = requests.post(url=tokenurl,data=json.dumps(data),headers=headers)
+        tilte.encoding = 'utf-8'
+        print(tilte.content.decode('utf-8'))
         return Response(result)
