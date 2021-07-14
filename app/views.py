@@ -463,9 +463,8 @@ class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin
         data = {
             "type": "news",
             "offset": 0,
-            "count": 20
+            "count": 1
         }
         tilte = requests.post(url=tokenurl,data=json.dumps(data),headers=headers)
-        tilte.encoding = 'utf-8'
-        print(tilte.content.decode('utf-8'))
-        return Response(result)
+        con = tilte.content.decode('utf-8')
+        return Response(con)
