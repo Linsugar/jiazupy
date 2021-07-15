@@ -144,23 +144,24 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         user_id = request.data['user_id']
         user_name = request.data['up_name']
         up_avator = request.data['up_avator']
-        print(request.data['image'])
-        filpath =request.FILES.get("image", None)
-        print(filpath)
-        filelist = request.FILES.getlist("image")
-        for ifile in filelist:
-            gettime = str(time.time())
-            sptime = gettime.split('.')
-            path = default_storage.save('untils/somename.jpg', ContentFile(ifile.read()))
-            tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-            upResult = Bucket_Handle().Upload_File(filename=sptime[0]+sptime[1]+".jpg", filepath=tmp_file)
-            uplist.append(upResult["url"])
-            print("===============================")
+        Up_image = request.data['image']
+        # print(request.data['image'])
+        # filpath =request.FILES.get("image", None)
+        # print(filpath)
+        # filelist = request.FILES.getlist("image")
+        # for ifile in filelist:
+        #     gettime = str(time.time())
+        #     sptime = gettime.split('.')
+        #     path = default_storage.save('untils/somename.jpg', ContentFile(ifile.read()))
+        #     tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+        #     upResult = Bucket_Handle().Upload_File(filename=sptime[0]+sptime[1]+".jpg", filepath=tmp_file)
+        #     uplist.append(upResult["url"])
+        #     print("===============================")
         updata={
             "user_id":user_id,
-            "Old_Imagename":str(filpath),
+            "Old_Imagename":str('old'),
             "New_Imagename":str(new_filename),
-            "Up_ImageUrl":json.dumps(uplist),
+            "Up_ImageUrl":json.dumps(Up_image),
             "Up_Title":up_title,
             "Up_Context":up_context,
             "Up_addres":up_addres,
@@ -290,14 +291,22 @@ class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = wx_Serializers
     authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
-        query = weixinartic.objects.all()
-        queryset = self.filter_queryset(queryset=query)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        return JsonResponse(serializer.data,safe=False)
+        appid = 'wx50f04c5bde8f1938'
+        secret = '784069c669fd121a564a836dae2f1d8b'
+        url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (appid, secret)
+        result = requests.get(url)
+        rs = json.loads(result.content)
+        print(rs['access_token'])
+        headers = {'Content-Type': 'application/json'}
+        tokenurl = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=' + rs['access_token']
+        data = {
+            "type": "news",
+            "offset": 0,
+            "count": 10
+        }
+        tilte = requests.post(url=tokenurl, data=json.dumps(data), headers=headers)
+        con = tilte.content.decode('utf-8')
+        return JsonResponse(con,safe=False)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -426,7 +435,7 @@ class Team_Manger(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 class Videos(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = video_Serializers
     queryset = Videosmodel.objects.all()
-    authentication_classes = [Jwt_Authentication]
+    # authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
@@ -463,7 +472,7 @@ class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin
         data = {
             "type": "news",
             "offset": 0,
-            "count": 1
+            "count": 2
         }
         tilte = requests.post(url=tokenurl,data=json.dumps(data),headers=headers)
         con = tilte.content.decode('utf-8')
