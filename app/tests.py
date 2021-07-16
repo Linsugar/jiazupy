@@ -24,14 +24,28 @@
 # # result = requests.post(url=url,data=data,headers=headers)
 # # print(result.status_code)
 # # rs = json.loads(result.text)
-# # print(rs['token'])
+# # # print(rs['token'])
+#
+#
+# inputValue = input("请输入内容：")
+#
+# print(type(inputValue))
+# # 判断是否全字母符串
+# res  = inputValue.isalpha()
+# #判断是否
+# print(res)
 
+import json
 
-inputValue = input("请输入内容：")
+data = [
+'xx','xxx','22'
+]
+v = "['xxx','xxx2','xxxx1']"
+s = eval(v)
+print(s)
+print(type(s))
+print(eval(v))
+k = ["xxx","xxx2","xxxx1"]
 
-print(type(inputValue))
-# 判断是否全字母符串
-res  = inputValue.isalpha()
-#判断是否
-print(res)
-
+json_data = json.dumps(k )
+print(json_data)

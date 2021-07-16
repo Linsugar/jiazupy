@@ -50,8 +50,7 @@ class Image_Serializers(ModelSerializer):
 
     def validate(self, attrs):
         print('发布动图：%s'%attrs)
-        print("进入图片")
-        return  attrs
+        return attrs
 class feedback_Serializers(ModelSerializer):
     class Meta:
         model = feedback

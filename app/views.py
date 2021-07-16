@@ -127,14 +127,15 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         else:
-            query = Dynamic_Image.objects.filter(user_id=307844349484234).all()
+            query = Dynamic_Image.objects.all()
             queryset = self.filter_queryset(query)
             page = self.paginate_queryset(queryset)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
+            print(serializer.data)
+            return JsonResponse(serializer.data,safe=False)
     def create(self, request, *args, **kwargs):
         uplist = []
         new_filename = request.data['new_filename']
@@ -144,19 +145,10 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         user_id = request.data['user_id']
         user_name = request.data['up_name']
         up_avator = request.data['up_avator']
-        Up_image = request.data['image']
-        # print(request.data['image'])
-        # filpath =request.FILES.get("image", None)
-        # print(filpath)
-        # filelist = request.FILES.getlist("image")
-        # for ifile in filelist:
-        #     gettime = str(time.time())
-        #     sptime = gettime.split('.')
-        #     path = default_storage.save('untils/somename.jpg', ContentFile(ifile.read()))
-        #     tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-        #     upResult = Bucket_Handle().Upload_File(filename=sptime[0]+sptime[1]+".jpg", filepath=tmp_file)
-        #     uplist.append(upResult["url"])
-        #     print("===============================")
+        image = request.data.get('image')
+        if isinstance(image,str):
+            image = request.data.getlist('image')
+        Up_image =eval(str(image))
         updata={
             "user_id":user_id,
             "Old_Imagename":str('old'),
@@ -171,7 +163,7 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         serializer = self.get_serializer(data=updata)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        return JsonResponse(updata)
+        return Response(updata)
 # 获取所有动态
 class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
