@@ -52,7 +52,7 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             payload = jwt_payload_handler(obj)
             self.token = jwt_encode_handler(payload)
             roogtoken = rong.register_roog(name=obj1.username, user_id=obj1.user_id, portraitUri=obj1.avator_image)['token']
-            print('roottoken:'+roogtoken)
+            print('roogtoken:'+roogtoken)
             User_token.objects.update_or_create(
                 token_id=User.objects.filter(user_mobile=user_mobile).first(),
                 defaults={
@@ -67,12 +67,7 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             return JsonResponse(oc)
         else:
             try:
-                filpath = request.FILES.get("avator_image", None)
-                gettime = str(time.time())
-                sptime = gettime.split('.')
-                path = default_storage.save('untils/somename.jpg', ContentFile(filpath.read()))
-                tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-                upResult = Bucket_Handle().Upload_File(filename=sptime[0] + sptime[1] + ".jpg", filepath=tmp_file)
+                avator_image = request.data.get("avator_image",None)
                 Redata = {
                     'user_id': userid,
                     'invite_number': 666666,
@@ -81,14 +76,14 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
                     'user_mobile': user_mobile,
                     'password': request.data['password'],
                     'username': request.data['username'],
-                    'avator_image': upResult["url"],
+                    'avator_image':avator_image,
                     'city': request.data['city'],
                     'user_sex': request.data['user_sex'],
                     'create_ip': request.META.get("REMOTE_ADDR"),
                 }
                 serializer = self.get_serializer(data=Redata)
                 serializer.is_valid(raise_exception=True)
-                roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=upResult["url"])['token']
+                roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=avator_image)['token']
                 User_token.objects.update_or_create(
                     token_id=User.objects.filter(user_mobile=user_mobile).first(),
                     user_token=roogtoken)
@@ -288,6 +283,7 @@ class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (appid, secret)
         result = requests.get(url)
         rs = json.loads(result.content)
+        print(rs)
         print(rs['access_token'])
         headers = {'Content-Type': 'application/json'}
         tokenurl = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=' + rs['access_token']
@@ -447,7 +443,6 @@ class Videos(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 import requests
 import json
 class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
-    authentication_classes = [Jwt_Authentication]
     def create(self, request, *args, **kwargs):
         QiuToken = Bucket_Handle().upToken()
         return Response(QiuToken)
