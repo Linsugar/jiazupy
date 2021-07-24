@@ -35,17 +35,24 @@
 # #判断是否
 # print(res)
 
-import json
+# import json
+#
+# data = [
+# 'xx','xxx','22'
+# ]
+# v = "['xxx','xxx2','xxxx1']"
+# s = eval(v)
+# print(s)
+# print(type(s))
+# print(eval(v))
+# k = ["xxx","xxx2","xxxx1"]
+#
+# json_data = json.dumps(k )
+# print(json_data)
+import time
 
-data = [
-'xx','xxx','22'
-]
-v = "['xxx','xxx2','xxxx1']"
-s = eval(v)
-print(s)
-print(type(s))
-print(eval(v))
-k = ["xxx","xxx2","xxxx1"]
+timestamp = time.time()
+print(timestamp)
+timestr = time.strftime('%Y-%m-%d',time.localtime(timestamp))
+print(timestr)
 
-json_data = json.dumps(k )
-print(json_data)

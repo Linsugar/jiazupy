@@ -222,7 +222,11 @@ class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        data = {
+           "msg":"反馈成功",
+            "code":200
+        }
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
 class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = release_Serializers
@@ -283,18 +287,19 @@ class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = wx_Serializers
     authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
+        count = request.query_params.get("count")
         appid = 'wx50f04c5bde8f1938'
         secret = '784069c669fd121a564a836dae2f1d8b'
         url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (appid, secret)
         result = requests.get(url)
         rs = json.loads(result.content)
-        print(rs['access_token'])
+        print(rs)
         headers = {'Content-Type': 'application/json'}
         tokenurl = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=' + rs['access_token']
         data = {
             "type": "news",
             "offset": 0,
-            "count": 10
+            "count": count
         }
         tilte = requests.post(url=tokenurl, data=json.dumps(data), headers=headers)
         con = tilte.content.decode('utf-8')

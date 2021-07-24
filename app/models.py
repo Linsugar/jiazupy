@@ -75,6 +75,7 @@ class feedback(models.Model):
     feedback_time = models.DateTimeField(auto_now=True)
     # 反馈处理人
     feedback_dealpeople = models.CharField(max_length=20,default='Tang')
+    feedback = models.CharField(max_length=64,default='等待处理')
 
 class releasenew(models.Model):
     news_id = models.CharField(max_length=16)
