@@ -2,7 +2,7 @@ import random
 import time
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from rest_framework.response import Response
 import json
 import os
@@ -11,9 +11,9 @@ from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, \
     release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers, \
-    review_Serializers, teams_Serializers, video_Serializers, feedback_Serializers
+    review_Serializers, teams_Serializers, video_Serializers, feedback_Serializers, Recruitment_Serializers
 from app.models import User, User_token, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
-    Dynamic_review, Teams, Videosmodel
+    Dynamic_review, Teams, Videosmodel, Recruitment
 from app.untils.Aut import Jwt_Authentication
 from app.untils.ossqiniu.connectBucket import Bucket_Handle
 from app.untils.rongyun.roog import rongyun
@@ -186,6 +186,8 @@ class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixi
     authentication_classes = [Jwt_Authentication]
     serializer_class = review_Serializers
     def list(self, request, *args, **kwargs):
+        rid = request.query_params.get("review_rd")
+        print(rid)
         query = Dynamic_review.objects.filter(review_rd=request.query_params.get("review_rd")).all()
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
@@ -474,3 +476,29 @@ class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin
         tilte = requests.post(url=tokenurl,data=json.dumps(data),headers=headers)
         con = tilte.content.decode('utf-8')
         return Response(con)
+
+from django.forms.models import model_to_dict
+class RecruitmentView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    authentication_classes = [Jwt_Authentication]
+    serializer_class = Recruitment_Serializers
+    queryset = Recruitment.objects.all()
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+        Recruid = random.randint(100000000000,900000000000)
+        mydict =request.data.copy()
+        mydict.update({"recruitment_createid":Recruid})
+        if(request.data.get('recruitment_Image') !=None):
+            Up_image = eval(str(request.data.get('recruitment_Image')))
+            mydict.update({'recruitment_Image':json.dumps(Up_image)})
+        serializer = self.get_serializer(data=mydict)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

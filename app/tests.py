@@ -49,10 +49,12 @@
 #
 # json_data = json.dumps(k )
 # print(json_data)
-import time
+# import time
+#
+# timestamp = time.time()
+# print(timestamp)
+# timestr = time.strftime('%Y-%m-%d',time.localtime(timestamp))
+# print(timestr)
+a = ['1']
 
-timestamp = time.time()
-print(timestamp)
-timestr = time.strftime('%Y-%m-%d',time.localtime(timestamp))
-print(timestr)
-
+print(len(a))

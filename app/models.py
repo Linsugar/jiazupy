@@ -161,3 +161,29 @@ class Videosmodel(models.Model):
     video_url = models.TextField()
     video_cover = models.TextField()
 
+# 招聘信息
+class Recruitment(models.Model):
+    # 招聘唯一id
+    recruitment_createid =models.CharField(max_length=64,unique=True)
+    # 招聘发起者id
+    recruitment_id  = models.CharField(max_length=32)
+    # 招聘类型
+    recruitment_type = models.CharField(max_length=16)
+    # 招聘岗位
+    recruitment_job = models.CharField(max_length=24)
+    # 招聘工资
+    recruitment_money  = models.CharField(max_length=16)
+    # 招聘地点
+    recruitment_address = models.CharField(max_length=64)
+    # 招聘公司
+    recruitment_company = models.CharField(max_length=64)
+    # 招聘发起者
+    recruitment_person = models.CharField(max_length=64)
+    # 招聘宣传图
+    recruitment_Image = models.TextField(null=True)
+    # 招聘宣传内容/大概介绍
+    recruitment_Content = models.TextField()
+    # 招聘方式
+    recruitment_Phone = models.CharField(max_length=64)
+    # 招聘创建时间
+    recruitment_time = models.DateTimeField(auto_now=True)

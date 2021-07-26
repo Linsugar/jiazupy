@@ -5,7 +5,7 @@ import re
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
 from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, weixinartic, sendtask, \
-    Dynamic_review, Teams, Videosmodel
+    Dynamic_review, Teams, Videosmodel, Recruitment
 
 
 class User_Serializers(ModelSerializer):
@@ -114,3 +114,11 @@ class video_Serializers(ModelSerializer):
         print("进去video_Serializers")
         return attrs
 
+class Recruitment_Serializers(ModelSerializer):
+    class Meta:
+        model = Recruitment
+        fields = '__all__'
+
+    def validate(self, attrs):
+        print("Recruitment_Serializers")
+        return attrs
