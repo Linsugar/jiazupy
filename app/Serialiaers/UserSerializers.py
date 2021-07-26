@@ -115,6 +115,8 @@ class video_Serializers(ModelSerializer):
         return attrs
 
 class Recruitment_Serializers(ModelSerializer):
+    recruitment_company = CharField(required=False, max_length=32, allow_blank=True,default="等待")
+    recruitment_address = CharField(required=False, max_length=32, allow_blank=True,default="等待")
     class Meta:
         model = Recruitment
         fields = '__all__'

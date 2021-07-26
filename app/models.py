@@ -174,9 +174,9 @@ class Recruitment(models.Model):
     # 招聘工资
     recruitment_money  = models.CharField(max_length=16)
     # 招聘地点
-    recruitment_address = models.CharField(max_length=64)
+    recruitment_address = models.CharField(max_length=64,default="待定")
     # 招聘公司
-    recruitment_company = models.CharField(max_length=64)
+    recruitment_company = models.CharField(max_length=64,default="待定")
     # 招聘发起者
     recruitment_person = models.CharField(max_length=64)
     # 招聘宣传图
