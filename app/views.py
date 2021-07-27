@@ -2,6 +2,7 @@ import random
 import time
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.db.models.query_utils import Q
 from django.http import JsonResponse, QueryDict
 from rest_framework.response import Response
 import json
@@ -477,7 +478,7 @@ class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin
         con = tilte.content.decode('utf-8')
         return Response(con)
 
-from django.forms.models import model_to_dict
+
 class RecruitmentView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
     serializer_class = Recruitment_Serializers
@@ -491,14 +492,44 @@ class RecruitmentView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMix
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     def create(self, request, *args, **kwargs):
+        result = {
+            "msg":"成功",
+            "statues":200
+        }
         Recruid = random.randint(100000000000,900000000000)
         mydict =request.data.copy()
         mydict.update({"recruitment_createid":Recruid})
-        if(request.data.get('recruitment_Image') !=None):
+        if request.data.get('recruitment_Image') is not None:
             Up_image = eval(str(request.data.get('recruitment_Image')))
             mydict.update({'recruitment_Image':json.dumps(Up_image)})
         serializer = self.get_serializer(data=mydict)
-        serializer.is_valid(raise_exception=True)
+        res = serializer.is_valid(raise_exception=False)
+        if res is False:
+            err = serializer.errors
+            print(err)
+            detail = err['non_field_errors'][0]
+            result.update({'msg':detail,'statues':status.HTTP_400_BAD_REQUEST})
+            return Response(result)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        result.update({'msg':"成功", 'statues': status.HTTP_201_CREATED})
+        return Response(result)
+
+
+class FilterRecruitment(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    authentication_classes = [Jwt_Authentication]
+    serializer_class = Recruitment_Serializers
+
+    def list(self, request, *args, **kwargs):
+        company =request.query_params.get('recruitment_company')
+        money = request.query_params.get('recruitment_money')
+        job = request.query_params.get('recruitment_job')
+        print(money,company,job)
+        query = Recruitment.objects.filter(Q(recruitment_company__contains=company) & Q(recruitment_money_contains=money) & Q(recruitment_job__contains=job))
+        print(query)
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

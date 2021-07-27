@@ -117,10 +117,33 @@ class video_Serializers(ModelSerializer):
 class Recruitment_Serializers(ModelSerializer):
     recruitment_company = CharField(required=False, max_length=32, allow_blank=True,default="等待")
     recruitment_address = CharField(required=False, max_length=32, allow_blank=True,default="等待")
+    recruitment_Phone = CharField(required=False, max_length=32, allow_blank=True,default="等待")
+    recruitment_money = CharField(required=False, max_length=32, allow_blank=True,default="等待")
     class Meta:
         model = Recruitment
         fields = '__all__'
 
     def validate(self, attrs):
         print("Recruitment_Serializers")
-        return attrs
+        if attrs.get('recruitment_type') == "招聘":
+            if attrs.get('recruitment_company') == '':
+                raise ValidationError(detail="公司不能为空")
+            elif attrs.get('recruitment_address') == '':
+                raise ValidationError(detail="公司地址不能为空")
+            elif attrs.get('recruitment_money') == '':
+                raise ValidationError(detail="请填写大概薪资范畴")
+            elif attrs.get('recruitment_Content') == '':
+                raise ValidationError(detail="请大概介绍一下吧")
+            elif attrs.get('recruitment_Phone') == '':
+                raise ValidationError(detail="请留下联系方式")
+            else:
+                return attrs
+        else:
+            if attrs.get('recruitment_Content') == '':
+                raise ValidationError(detail="请大概介绍一下吧")
+            elif attrs.get('recruitment_Phone') == '':
+                raise ValidationError(detail="请留下联系方式")
+            elif attrs.get('recruitment_money') == '':
+                raise ValidationError(detail="请填写大概薪资范畴")
+            else:
+                return attrs
