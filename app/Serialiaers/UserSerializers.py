@@ -44,12 +44,31 @@ class UserInfo_Serializers(ModelSerializer):
         print("1")
         return  attrs
 class Image_Serializers(ModelSerializer):
+    Up_Title = CharField(required=False, max_length=32, allow_blank=True,default="标题")
+    Up_Context = CharField(required=False, max_length=300, allow_blank=True,default="标题")
     class Meta:
         model = Dynamic_Image
         fields = "__all__"
 
     def validate(self, attrs):
         print('发布动图：%s'%attrs)
+        Up_Title = attrs.get('Up_Title')
+        Up_Context = attrs.get('Up_Context')
+        print(Up_Context)
+        if Up_Title.isnumeric():
+            raise ValidationError(detail="您的标题不合法")
+        elif Up_Title.isspace():
+            raise ValidationError(detail="您的标题不合法")
+        elif len(Up_Title) == 0:
+            raise ValidationError(detail="标题不能为空")
+        elif Up_Context.isnumeric() :
+            raise ValidationError(detail="您的内容不合法")
+        elif Up_Context.isspace():
+            raise ValidationError(detail="您的内容不合法")
+        elif len(Up_Context)==0:
+            raise ValidationError(detail="内容过短")
+        elif len(Up_Context)>200:
+            raise ValidationError(detail="内容过长")
         return attrs
 class feedback_Serializers(ModelSerializer):
     class Meta:

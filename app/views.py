@@ -138,33 +138,30 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
             print(serializer.data)
             return JsonResponse(serializer.data,safe=False)
     def create(self, request, *args, **kwargs):
-        uplist = []
-        new_filename = request.data['new_filename']
-        up_title = request.data['up_title']
-        up_context = request.data['up_context']
-        up_addres = request.data['up_addres']
-        user_id = request.data['user_id']
-        user_name = request.data['up_name']
-        up_avator = request.data['up_avator']
-        image = request.data.get('image')
-        if isinstance(image,str):
-            image = request.data.getlist('image')
-        Up_image =eval(str(image))
-        updata={
-            "user_id":user_id,
-            "Old_Imagename":str('old'),
-            "New_Imagename":str(new_filename),
-            "Up_ImageUrl":json.dumps(Up_image),
-            "Up_Title":up_title,
-            "Up_Context":up_context,
-            "Up_addres":up_addres,
-            "Up_name":user_name,
-            "Up_avator":up_avator,
+        msg = {
+            "msg": "成功",
+            "statues": status.HTTP_201_CREATED
         }
-        serializer = self.get_serializer(data=updata)
-        serializer.is_valid(raise_exception=True)
+        new_filename = request.data['new_filename']
+        image = request.data.get('image')
+        Up_image = eval(str(image))
+        result = request.data.copy()
+        result.update({
+            "Up_ImageUrl":json.dumps(Up_image),
+            "New_Imagename": str(new_filename),
+            "Old_Imagename": str('old'),
+        })
+        serializer = self.get_serializer(data=result)
+        res = serializer.is_valid(raise_exception=False)
+        print(res)
+        if res is False:
+            err = serializer.errors
+            print(err)
+            detail = err['non_field_errors'][0]
+            msg.update({'msg': detail, 'statues': status.HTTP_400_BAD_REQUEST})
+            return Response(msg)
         self.perform_create(serializer)
-        return Response(updata)
+        return Response(msg)
 # 获取所有动态
 class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
@@ -518,13 +515,12 @@ class RecruitmentView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMix
 class FilterRecruitment(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
     serializer_class = Recruitment_Serializers
-
     def list(self, request, *args, **kwargs):
         company =request.query_params.get('recruitment_company')
         money = request.query_params.get('recruitment_money')
         job = request.query_params.get('recruitment_job')
         print(money,company,job)
-        query = Recruitment.objects.filter(Q(recruitment_company__contains=company) & Q(recruitment_money_contains=money) & Q(recruitment_job__contains=job))
+        query = Recruitment.objects.filter(Q(recruitment_company__contains=company) & Q(recruitment_money__contains= money) & Q(recruitment_job__contains=job))
         print(query)
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
