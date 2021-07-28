@@ -68,7 +68,7 @@ class Image_Serializers(ModelSerializer):
         elif len(Up_Context)==0:
             raise ValidationError(detail="内容过短")
         elif len(Up_Context)>200:
-            raise ValidationError(detail="内容过长")
+            raise ValidationError(detail="内容过长 ")
         return attrs
 class feedback_Serializers(ModelSerializer):
     class Meta:
