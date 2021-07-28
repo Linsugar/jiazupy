@@ -494,7 +494,7 @@ class RecruitmentView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMix
             "statues":200
         }
         Recruid = random.randint(100000000000,900000000000)
-        mydict =request.data.copy()
+        mydict = request.data.copy()
         mydict.update({"recruitment_createid":Recruid})
         if request.data.get('recruitment_Image') is not None:
             Up_image = eval(str(request.data.get('recruitment_Image')))
