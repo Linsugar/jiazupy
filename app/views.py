@@ -529,3 +529,19 @@ class FilterRecruitment(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelM
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+class FilterDynamicImage(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
+    authentication_classes = [Jwt_Authentication]
+    serializer_class = Image_Serializers
+
+    def list(self, request, *args, **kwargs):
+        filter_context = request.query_params.get('filter_context')
+        print(filter_context)
+        query = Dynamic_Image.objects.filter(Q(Up_Context__contains=filter_context) | Q(Up_Title__contains=filter_context))
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

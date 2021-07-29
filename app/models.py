@@ -14,7 +14,7 @@ class User(AbstractUser):
     # 创建时ip地址
     create_ip = models.CharField(max_length=21)
     # 城市
-    city  = models.CharField(max_length=16)
+    city= models.CharField(max_length=16)
     # 邀请码
     invite_number = models.IntegerField()
     # 生日
