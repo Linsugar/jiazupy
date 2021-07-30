@@ -1,19 +1,18 @@
 
 from rest_framework.serializers import ModelSerializer,ValidationError,JSONField,CharField
 import re
-
+from app.untils.Md5Catch import GetLocalTime
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, weixinartic, sendtask, \
+from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, sendtask, \
     Dynamic_review, Teams, Videosmodel, Recruitment
 
 
 class User_Serializers(ModelSerializer):
+    create_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = User
         fields = "__all__"
-    print('111')
-
     def validate(self, attrs):
         print("进入")
         user_mobile=attrs.get('user_mobile',None)
@@ -36,25 +35,23 @@ class User_Serializers(ModelSerializer):
             self.token = jwt_encode_handler(payload)
             return attrs
 class UserInfo_Serializers(ModelSerializer):
+    create_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = User
         fields = "__all__"
-    print('111')
-    def validate(self, attrs):
-        print("1")
-        return  attrs
+    def validate(self,attrs):
+        return attrs
 class Image_Serializers(ModelSerializer):
     Up_Title = CharField(required=False, max_length=32, allow_blank=True,default="标题")
     Up_Context = CharField(required=False, max_length=300, allow_blank=True,default="标题")
+    Up_Time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = Dynamic_Image
         fields = "__all__"
 
     def validate(self, attrs):
-        print('发布动图：%s'%attrs)
         Up_Title = attrs.get('Up_Title')
         Up_Context = attrs.get('Up_Context')
-        print(Up_Context)
         if Up_Title.isnumeric():
             raise ValidationError(detail="您的标题不合法")
         elif Up_Title.isspace():
@@ -71,45 +68,34 @@ class Image_Serializers(ModelSerializer):
             raise ValidationError(detail="内容过长 ")
         return attrs
 class feedback_Serializers(ModelSerializer):
+    feedback_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = feedback
         fields = "__all__"
-
     def validate(self, attrs):
         print('反馈：%s'%attrs)
-        print("反馈")
         return attrs
-class roog_Serializers(ModelSerializer):
-    class Meta:
-        model = feedback
-        fields = "__all__"
+# class roog_Serializers(ModelSerializer):
+#     feedback_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
+#     class Meta:
+#         model = feedback
+#         fields = "__all__"
+#
 class release_Serializers(ModelSerializer):
     class Meta:
         model = User_token
         fields = "__all__"
-
     def validate(self, attrs):
-        print("进入release")
-        return attrs
-
-class wx_Serializers(ModelSerializer):
-    class Meta:
-        model=weixinartic
-        fields = '__all__'
-
-    def validate(self, attrs):
-        print("进去wx_Serializers")
         return attrs
 
 class SendTask_Serializers(ModelSerializer):
+    tasktime = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = sendtask
         fields = '__all__'
-    def validate(self, attrs):
-        print("进去SendTask_Serializers")
-        return attrs
 
 class review_Serializers(ModelSerializer):
+    review_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = Dynamic_review
         fields = '__all__'
@@ -118,6 +104,7 @@ class review_Serializers(ModelSerializer):
         return attrs
 
 class teams_Serializers(ModelSerializer):
+    Team_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = Teams
         fields = '__all__'
@@ -126,6 +113,7 @@ class teams_Serializers(ModelSerializer):
         return attrs
 
 class video_Serializers(ModelSerializer):
+    video_Time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
         model = Videosmodel
         fields = '__all__'
@@ -138,6 +126,8 @@ class Recruitment_Serializers(ModelSerializer):
     recruitment_address = CharField(required=False, max_length=32, allow_blank=True,default="等待")
     recruitment_Phone = CharField(required=False, max_length=32, allow_blank=True,default="等待")
     recruitment_money = CharField(required=False, max_length=32, allow_blank=True,default="等待")
+    recruitment_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
+
     class Meta:
         model = Recruitment
         fields = '__all__'

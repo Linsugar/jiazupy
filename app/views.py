@@ -11,9 +11,9 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, \
-    release_Serializers, roog_Serializers, UserInfo_Serializers, wx_Serializers, SendTask_Serializers, \
+    release_Serializers,  UserInfo_Serializers,  SendTask_Serializers, \
     review_Serializers, teams_Serializers, video_Serializers, feedback_Serializers, Recruitment_Serializers
-from app.models import User, User_token, Dynamic_Image, feedback, releasenew, weixinartic, sendtask, \
+from app.models import User, User_token, Dynamic_Image, feedback, releasenew, sendtask, \
     Dynamic_review, Teams, Videosmodel, Recruitment
 from app.untils.Aut import Jwt_Authentication
 from app.untils.ossqiniu.connectBucket import Bucket_Handle
@@ -250,7 +250,7 @@ class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
-    serializer_class = roog_Serializers
+    serializer_class = feedback_Serializers
     authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -284,7 +284,7 @@ class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             return JsonResponse(data=result, safe=False)
 
 class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
-    serializer_class = wx_Serializers
+
     authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         count = request.query_params.get("count")

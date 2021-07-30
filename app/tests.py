@@ -49,12 +49,12 @@
 #
 # json_data = json.dumps(k )
 # print(json_data)
-# import time
-#
-# timestamp = time.time()
-# print(timestamp)
-# timestr = time.strftime('%Y-%m-%d',time.localtime(timestamp))
-# print(timestr)
-a = ['1']
+import locale
 
-print(len(a))
+from datetime import datetime
+
+
+locale.setlocale(locale.LC_CTYPE, 'chinese')
+stime = datetime.now()
+s = stime.strftime('%Y年%m月%d日 %H:%M:%S')
+print(s)

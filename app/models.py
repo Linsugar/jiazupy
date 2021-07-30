@@ -1,11 +1,6 @@
 from django.contrib.auth.models import AbstractUser
+
 from django.db import models
-
-# Create your models here.
-from django.db import models
-
-# Create your models here.
-
 class User(AbstractUser):
     # 用户唯一id
     user_id = models.CharField(max_length=21,unique=True)
@@ -22,7 +17,7 @@ class User(AbstractUser):
     # 用户手机
     user_mobile = models.CharField(max_length=13,unique=True)
     #注册时间
-    create_time = models.DateTimeField(auto_now_add=True)
+    create_time = models.CharField(max_length=64)
     # 设备id
     deviceid = models.CharField(max_length=64)
     # 设备平台
@@ -49,7 +44,7 @@ class User_Image(models.Model):
 
 class Dynamic_Image(models.Model):
     user_id = models.CharField(max_length=16)
-    Up_Time = models.DateTimeField(auto_now=True)
+    Up_Time = models.CharField(max_length=64)
     Old_Imagename = models.CharField(max_length=64)
     New_Imagename = models.CharField(max_length=64)
     Up_ImageUrl = models.TextField()
@@ -65,14 +60,14 @@ class Dynamic_review(models.Model):
     recview_avator = models.TextField()
     review_content = models.CharField(max_length=64)
     review_name = models.CharField(max_length=16)
-    review_time = models.DateTimeField(auto_now=True)
+    review_time = models.CharField(max_length=64)
     review_bool = models.IntegerField(default=0)
 
 # 反馈
 class feedback(models.Model):
     feed_id = models.CharField(max_length=20)
     feedback_context = models.TextField()
-    feedback_time = models.DateTimeField(auto_now=True)
+    feedback_time = models.CharField(max_length=64)
     # 反馈处理人
     feedback_dealpeople = models.CharField(max_length=20,default='Tang')
     feedback = models.CharField(max_length=64,default='等待处理')
@@ -85,22 +80,8 @@ class releasenew(models.Model):
     news_avatimage = models.URLField()
     news_username = models.CharField(max_length=16)
     user_id = models.CharField(max_length=32)
-    news_time = models.DateTimeField(auto_now=True)
+    news_time = models.CharField(max_length=64)
 
-class weixinartic(models.Model):
-    ClsChoice=(
-        (1,'宠物'),
-        (2,'旅游'),
-        (3,'电竞'),
-        (4,'汽车'),
-        (5,'搞笑')
-    )
-    wxurl=models.TextField()
-    wxtitle = models.CharField(max_length=16)
-    wximage = models.TextField()
-    wxuserid=models.CharField(max_length=26)
-    wxtime=models.DateTimeField(auto_now=True)
-    wxclass=models.IntegerField(choices=ClsChoice,default=1)
 
 class sendtask(models.Model):
     ClsChoice = (
@@ -113,7 +94,7 @@ class sendtask(models.Model):
     # 任务分类
     taskcls = models.IntegerField(choices=ClsChoice,default=1)
     # 任务发布时间
-    tasktime = models.DateTimeField(auto_now=True)
+    tasktime = models.CharField(max_length=64)
     # 任务标题
     tasktitle= models.CharField(max_length=16)
     # 任务内容
@@ -149,12 +130,12 @@ class Teams(models.Model):
     Team_level = models.IntegerField(default=0)#团队可加入等级
     Team_Score = models.IntegerField(null=True)#团队可加入积分
     Team_sex = models.CharField(null=True,max_length=12)#团队可加入性别
-    Team_time = models.DateTimeField(auto_now=True)#团队创建时间
+    Team_time = models.CharField(max_length=64)
     Team_Dismissaltime = models.DateTimeField(null=True)#团队解散时间
 
 class Videosmodel(models.Model):
     video_Title = models.CharField(max_length=16)
-    video_Time = models.DateTimeField(auto_now=True)
+    video_Time =  models.CharField(max_length=64)
     video_context = models.TextField()
     video_upusername = models.CharField(max_length=16)
     video_upuserid = models.CharField(max_length=64)
@@ -164,7 +145,7 @@ class Videosmodel(models.Model):
 # 招聘信息
 class Recruitment(models.Model):
     # 招聘唯一id
-    recruitment_createid =models.CharField(max_length=64,unique=True)
+    recruitment_createid = models.CharField(max_length=64,unique=True)
     # 招聘发起者id
     recruitment_id  = models.CharField(max_length=32)
     # 招聘类型
@@ -186,4 +167,4 @@ class Recruitment(models.Model):
     # 招聘方式
     recruitment_Phone = models.CharField(max_length=64)
     # 招聘创建时间
-    recruitment_time = models.DateTimeField(auto_now=True)
+    recruitment_time =models.CharField(max_length=64)
