@@ -159,6 +159,9 @@ class Recruitment_Serializers(ModelSerializer):
 
 class Videos_Serializers(ModelSerializer):
     video_Time = CharField(required=False,max_length=64,allow_blank=True,default=GetLocalTime().GetTimeYearTime())
+    video_Title = CharField(required=False,allow_blank=True,max_length=64)
+    video_User = CharField(required=False,allow_blank=True,max_length=64)
+    video_Content = CharField(required=False,allow_blank=True,max_length=264)
     class Meta:
         model = VideosTabs
         fields = '__all__'

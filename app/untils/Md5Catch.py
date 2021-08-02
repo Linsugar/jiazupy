@@ -2,7 +2,7 @@ import locale
 import time
 import hashlib
 from datetime import datetime
-locale.setlocale(locale.LC_CTYPE, 'chinese')
+# locale.setlocale(locale.LC_CTYPE, 'chinese')
 class Power(object):
     def Power_Md5(self,user):
         m5 = hashlib.md5()
@@ -18,7 +18,7 @@ class GetLocalTime(object):
 #     获取本地时间
     def GetTimeYearTime(self):
 #     //年月日 时分秒
-        Ytime = self.NowTime.strftime('%Y年%m月%d日 %H:%M:%S')
+        Ytime = self.NowTime.strftime('%Y-%m-%d %H:%M:%S')
         return Ytime
 
 

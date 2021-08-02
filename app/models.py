@@ -184,7 +184,7 @@ class VideosTabs(models.Model):
 
 # 视频评论
 class VideosReviews(models.Model):
-    Review_id = models.CharField(max_length=64,unique=True)
+    Review_id = models.CharField(max_length=64)
     Review_name = models.CharField(max_length=12)
     Review_User = models.CharField(max_length=64)
     Review_photo = models.CharField(max_length=164)

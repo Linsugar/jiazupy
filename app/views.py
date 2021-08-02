@@ -550,7 +550,12 @@ class VideosList(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin)
     serializer_class = Videos_Serializers
     authentication_classes = [Jwt_Authentication]
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        video_id = random.randint(100000000000,800000000000)
+        mydict = request.data.copy()
+        mydict.update({
+            "video_id":video_id
+        })
+        serializer = self.get_serializer(data=mydict)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)

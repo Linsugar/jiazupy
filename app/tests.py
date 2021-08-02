@@ -54,7 +54,7 @@ import locale
 from datetime import datetime
 
 
-locale.setlocale(locale.LC_CTYPE, 'chinese')
+# locale.setlocale(locale.LC_CTYPE, 'chinese')
 stime = datetime.now()
-s = stime.strftime('%Y年%m月%d日 %H:%M:%S')
+s = stime.strftime('%Y-%m-%d %H:%M:%S')
 print(s)
