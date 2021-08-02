@@ -11,10 +11,11 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
 from rest_framework_jwt.serializers import jwt_payload_handler,jwt_encode_handler
 from app.Serialiaers.UserSerializers import User_Serializers, Image_Serializers, \
-    release_Serializers,  UserInfo_Serializers,  SendTask_Serializers, \
-    review_Serializers, teams_Serializers, video_Serializers, feedback_Serializers, Recruitment_Serializers
+    release_Serializers, UserInfo_Serializers, SendTask_Serializers, \
+    review_Serializers, teams_Serializers, video_Serializers, feedback_Serializers, Recruitment_Serializers, \
+    Videos_Serializers, VideoReviews_Serializers
 from app.models import User, User_token, Dynamic_Image, feedback, releasenew, sendtask, \
-    Dynamic_review, Teams, Videosmodel, Recruitment
+    Dynamic_review, Teams, Videosmodel, Recruitment, VideosTabs, VideosReviews
 from app.untils.Aut import Jwt_Authentication
 from app.untils.ossqiniu.connectBucket import Bucket_Handle
 from app.untils.rongyun.roog import rongyun
@@ -536,7 +537,6 @@ class FilterDynamicImage(GenericViewSet, mixins.CreateModelMixin, mixins.ListMod
 
     def list(self, request, *args, **kwargs):
         filter_context = request.query_params.get('filter_context')
-        print(filter_context)
         query = Dynamic_Image.objects.filter(Q(Up_Context__contains=filter_context) | Q(Up_Title__contains=filter_context))
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
@@ -545,3 +545,60 @@ class FilterDynamicImage(GenericViewSet, mixins.CreateModelMixin, mixins.ListMod
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+class VideosList(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
+    serializer_class = Videos_Serializers
+    authentication_classes = [Jwt_Authentication]
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def list(self, request, *args, **kwargs):
+        query = VideosTabs.objects.all()
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+class VideoFilter(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
+    authentication_classes = [Jwt_Authentication]
+    serializer_class = VideoReviews_Serializers
+
+    # 获取对应视频的评论
+    def list(self, request, *args, **kwargs):
+        Review_id = request.query_params.get('Review_id')
+        query = VideosReviews.objects.filter(Review_id=Review_id).all()
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    # 进行评论
+    def create(self, request, *args, **kwargs):
+        res = {
+            "msg":"评论成功",
+            "code":status.HTTP_200_OK
+        }
+        serializer = self.get_serializer(data=request.data)
+        result = serializer.is_valid(raise_exception=False)
+        if result:
+            self.perform_create(serializer)
+            return Response(res)
+        else:
+            err = serializer.errors
+            print(err)
+            detail = err['non_field_errors'][0]
+            res.update({
+                "msg": detail,
+                "code":status.HTTP_400_BAD_REQUEST
+            })
+            return Response(res)

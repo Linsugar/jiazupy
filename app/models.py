@@ -135,7 +135,7 @@ class Teams(models.Model):
 
 class Videosmodel(models.Model):
     video_Title = models.CharField(max_length=16)
-    video_Time =  models.CharField(max_length=64)
+    video_Time = models.CharField(max_length=64)
     video_context = models.TextField()
     video_upusername = models.CharField(max_length=16)
     video_upuserid = models.CharField(max_length=64)
@@ -167,4 +167,26 @@ class Recruitment(models.Model):
     # 招聘方式
     recruitment_Phone = models.CharField(max_length=64)
     # 招聘创建时间
-    recruitment_time =models.CharField(max_length=64)
+    recruitment_time = models.CharField(max_length=64)
+
+# 视频列表
+class VideosTabs(models.Model):
+    video_id = models.CharField(max_length=64,unique=True)
+    video_Time = models.CharField(max_length=64)
+    video_Title = models.CharField(max_length=24)
+    # 视频上传者
+    video_User = models.CharField(max_length=64)
+    # 视频封面
+    video_Image = models.TextField(null=True)
+    # 视频内容
+    video_Content = models.CharField(max_length=264,null=True)
+    video_url = models.TextField()
+
+# 视频评论
+class VideosReviews(models.Model):
+    Review_id = models.CharField(max_length=64,unique=True)
+    Review_name = models.CharField(max_length=12)
+    Review_User = models.CharField(max_length=64)
+    Review_photo = models.CharField(max_length=164)
+    Review_time = models.CharField(max_length=64)
+    Review_Content = models.CharField(max_length=64)

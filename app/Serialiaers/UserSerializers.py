@@ -5,7 +5,7 @@ from app.untils.Md5Catch import GetLocalTime
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
 from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, User_token, sendtask, \
-    Dynamic_review, Teams, Videosmodel, Recruitment
+    Dynamic_review, Teams, Videosmodel, Recruitment, VideosTabs, VideosReviews
 
 
 class User_Serializers(ModelSerializer):
@@ -156,3 +156,36 @@ class Recruitment_Serializers(ModelSerializer):
                 raise ValidationError(detail="请填写大概薪资范畴")
             else:
                 return attrs
+
+class Videos_Serializers(ModelSerializer):
+    video_Time = CharField(required=False,max_length=64,allow_blank=True,default=GetLocalTime().GetTimeYearTime())
+    class Meta:
+        model = VideosTabs
+        fields = '__all__'
+
+    def validate(self, attrs):
+        print(attrs)
+        image = attrs.get('video_Image')
+        title = attrs.get('video_Title')
+        content = attrs.get('video_Content')
+        if len(image) <= 0:
+            raise ValidationError(detail="请上传至少一张封面")
+        elif len(title) <= 0 | len(title) >= 20:
+            raise ValidationError(detail="标题不合法")
+        elif title.isnumeric() | title.isdigit() | title.isspace() | len(title) >=20 | len(title) <=0:
+            raise ValidationError(detail="标题不合法")
+        elif content.isnumeric() | content.isdigit() | content.isspace() | len(content) >=200 | len(content) <=0:
+            raise ValidationError(detail="标题不合法")
+        return attrs
+
+
+class VideoReviews_Serializers(ModelSerializer):
+    Review_time = CharField(required=False,max_length=64,allow_blank=True,default=GetLocalTime().GetTimeYearTime())
+    class Meta:
+        model = VideosReviews
+        fields = '__all__'
+    def validate(self, attrs):
+        result = attrs.get('Review_Content')
+        if result.isnumeric() | result.isdigit() | result.isspace():
+            raise ValidationError(detail="您输入的内容不合法")
+        return attrs

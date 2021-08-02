@@ -22,6 +22,8 @@ rou.register(viewset=views.GetQiNiuToken,prefix='qiniu',basename="视频管理")
 rou.register(viewset=views.RecruitmentView,prefix='rec',basename="招聘管理")
 rou.register(viewset=views.FilterRecruitment,prefix='fec',basename="招聘过滤")
 rou.register(viewset=views.FilterDynamicImage,prefix='fdy',basename="动态过滤")
+rou.register(viewset=views.VideosList,prefix='videolist',basename="视频列表")
+rou.register(viewset=views.VideoFilter,prefix='vifl',basename="视频评论")
 urlpatterns = [
     path('',include(rou.urls))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
