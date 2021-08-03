@@ -5,7 +5,7 @@ class User(AbstractUser):
     # 用户唯一id
     user_id = models.CharField(max_length=21,unique=True)
     # 用户头像
-    avator_image =models.CharField(max_length=100)
+    avator_image = models.TextField()
     # 创建时ip地址
     create_ip = models.CharField(max_length=21)
     # 城市

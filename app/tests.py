@@ -55,6 +55,7 @@ from datetime import datetime
 
 
 # locale.setlocale(locale.LC_CTYPE, 'chinese')
-stime = datetime.now()
-s = stime.strftime('%Y-%m-%d %H:%M:%S')
-print(s)
+# stime = datetime.now()
+# s = stime.strftime('%Y-%m-%d %H:%M:%S')
+# print(s)
+print(len("https://thirdwx.qlogo.cn/mmopen/vi_32/AH3uEYUVGPdxgMic6eCAx8LJdibgx0Z2gVeJO5yOhZ3VsLqdtxue2egPsdlmtSw0uBh63hazibChicvdtnUIPQlS6w/132"))

@@ -39,7 +39,6 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
         oc = {
             "msg":None,
             "token": None,
-            "avaror_iamge":None,
             "user_id":None,
             "user_name":None
         }
@@ -49,19 +48,19 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
         obj = User.objects.filter(user_mobile=user_mobile).first()
         if obj:
             obj1 = User.objects.filter(user_mobile=user_mobile).get()
-            if obj1.password !=password:
+            print(obj1.password)
+            if obj1.password != password:
                 return JsonResponse(data={"msg":"密码或手机号有误"})
             payload = jwt_payload_handler(obj)
             self.token = jwt_encode_handler(payload)
             roogtoken = rong.register_roog(name=obj1.username, user_id=obj1.user_id, portraitUri=obj1.avator_image)['token']
-            print('roottoken:'+roogtoken)
             User_token.objects.update_or_create(
                 token_id=User.objects.filter(user_mobile=user_mobile).first(),
                 defaults={
                     'user_token':roogtoken
                 })
             oc['token'] = self.token
-            oc['msg'] = "登录成功"
+            oc['msg'] = "成功"
             oc['avator_image'] = obj1.avator_image
             oc['user_id'] = obj1.user_id
             oc['roogtoken'] = roogtoken
@@ -69,36 +68,27 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
             return JsonResponse(oc)
         else:
             try:
-                filpath = request.FILES.get("avator_image", None)
-                gettime = str(time.time())
-                sptime = gettime.split('.')
-                path = default_storage.save('untils/somename.jpg', ContentFile(filpath.read()))
-                tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-                upResult = Bucket_Handle().Upload_File(filename=sptime[0] + sptime[1] + ".jpg", filepath=tmp_file)
-                Redata = {
+                result = request.data.copy()
+                result.update({
                     'user_id': userid,
-                    'invite_number': 666666,
-                    'platform': request.data['platform'],
-                    'deviceid': request.data['deviceid'],
-                    'user_mobile': user_mobile,
-                    'password': request.data['password'],
-                    'username': request.data['username'],
-                    'avator_image': upResult["url"],
-                    'city': request.data['city'],
-                    'user_sex': request.data['user_sex'],
                     'create_ip': request.META.get("REMOTE_ADDR"),
-                }
-                serializer = self.get_serializer(data=Redata)
-                serializer.is_valid(raise_exception=True)
-                roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=upResult["url"])['token']
+                })
+                serializer = self.get_serializer(data=result)
+                serializer.is_valid(raise_exception=False)
+                roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=result["avator_image"])['token']
                 User_token.objects.update_or_create(
                     token_id=User.objects.filter(user_mobile=user_mobile).first(),
                     user_token=roogtoken)
+                Redata = {}
                 Redata["token"] = serializer.token
-                Redata["msg"] = "注册成功"
-                Redata["roogtoken"] =roogtoken
+                Redata["msg"] = "成功"
+                Redata["roogtoken"] = roogtoken
+                Redata["avator_image"] = result["avator_image"]
+                Redata["user_id"] = result["user_id"]
+                Redata["user_name"] = result["user_name"]
                 return JsonResponse(Redata)
             except Exception as e:
+                print(e)
                 oc['msg']='不存在'
                 return JsonResponse(oc)
 class UserInfo(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
@@ -114,6 +104,12 @@ class UserInfo(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+# 注册用户
+class RegisterUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
+    pass
+
 class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = Image_Serializers
     authentication_classes = [Jwt_Authentication]

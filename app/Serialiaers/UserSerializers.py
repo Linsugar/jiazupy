@@ -14,7 +14,6 @@ class User_Serializers(ModelSerializer):
         model = User
         fields = "__all__"
     def validate(self, attrs):
-        print("进入")
         user_mobile=attrs.get('user_mobile',None)
         password=attrs.get('password',None)
         check_user=User.objects.filter(user_mobile=user_mobile)
@@ -23,7 +22,6 @@ class User_Serializers(ModelSerializer):
             if(User.objects.filter(user_mobile=user_mobile,password=password).exists()):
                 payload = jwt_payload_handler(user_obj)
                 self.token = jwt_encode_handler(payload)
-                print(self.token)
                 return attrs
             else:
                 raise ValidationError(detail='密码不正确')
@@ -34,6 +32,8 @@ class User_Serializers(ModelSerializer):
             payload = jwt_payload_handler(user_obj)
             self.token = jwt_encode_handler(payload)
             return attrs
+
+
 class UserInfo_Serializers(ModelSerializer):
     create_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
     class Meta:
