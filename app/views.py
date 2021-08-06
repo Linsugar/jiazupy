@@ -180,6 +180,7 @@ class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixi
     authentication_classes = [Jwt_Authentication]
     serializer_class = review_Serializers
     def list(self, request, *args, **kwargs):
+
         rid = request.query_params.get("review_rd")
         print(rid)
         query = Dynamic_review.objects.filter(review_rd=request.query_params.get("review_rd")).all()
@@ -192,9 +193,23 @@ class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixi
         return JsonResponse(serializer.data,safe=False)
 
     def create(self, request, *args, **kwargs):
+        result = {
+            "msg": "成功",
+            "code": 200
+        }
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        res = serializer.is_valid(raise_exception=False)
+        if res:
+            result.update({
+                "code":status.HTTP_200_OK
+            })
+            self.perform_create(serializer)
+            return Response(result)
+        else:
+            result.update({
+                "msg":"有误",
+                "code":status.HTTP_400_BAD_REQUEST
+            })
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
