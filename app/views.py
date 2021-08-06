@@ -150,7 +150,6 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         })
         serializer = self.get_serializer(data=result)
         res = serializer.is_valid(raise_exception=False)
-        print(res)
         if res is False:
             err = serializer.errors
             print(err)
@@ -205,17 +204,23 @@ class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         feed_id = request.query_params.get('feed_id',None)
-        obj = feedback.objects.filter(feed_id=feed_id).all()
-        queryset = self.filter_queryset(obj)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        return JsonResponse(serializer.data,safe=False)
+        if feed_id is not None:
+            obj = feedback.objects.filter(feed_id=feed_id).all()
+            queryset = self.filter_queryset(obj)
+            serializer = self.get_serializer(queryset, many=True)
+            return JsonResponse(serializer.data,safe=False)
+        else:
+            obj = feedback.objects.all()
+            queryset = self.filter_queryset(obj)
+            serializer = self.get_serializer(queryset, many=True)
+            return JsonResponse(serializer.data, safe=False)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        res = request.data.copy()
+        res.update({
+            "feed_createID":random.randint(100000000,300000000)
+        })
+        serializer = self.get_serializer(data=res)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -224,6 +229,33 @@ class FeeBackView(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             "code":200
         }
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class FeedBackDeal(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+    # 过滤反馈--回复反馈
+    serializer_class = feedback_Serializers
+    authentication_classes = [Jwt_Authentication]
+    def list(self, request, *args, **kwargs):
+        content = request.query_params.get("content")
+        query = feedback.objects.filter(Q(feed_createID__contains=content)|Q(feedback__contains=content) |Q(feedback_context__contains=content))
+        queryset = self.filter_queryset(query)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        fid = request.data.get('feed_id')
+        feed_content = request.data.get("feed_content")
+        fe = feedback.objects.get(feed_createID=fid)
+        fe.feedback = feed_content
+        fe.save()
+        result = {
+            "msg":"处理成功"
+        }
+        return Response(result)
 
 class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     serializer_class = release_Serializers
@@ -281,10 +313,11 @@ class Rongyun(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
             return JsonResponse(data=result, safe=False)
 
 class Wxarticle(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
-
     authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         count = request.query_params.get("count")
+        if count is None:
+            count = 10
         appid = 'wx50f04c5bde8f1938'
         secret = '784069c669fd121a564a836dae2f1d8b'
         url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (appid, secret)
@@ -544,7 +577,7 @@ class FilterDynamicImage(GenericViewSet, mixins.CreateModelMixin, mixins.ListMod
 
 class VideosList(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
     serializer_class = Videos_Serializers
-    authentication_classes = [Jwt_Authentication]
+    # authentication_classes = [Jwt_Authentication]
     def create(self, request, *args, **kwargs):
         video_id = random.randint(100000000000,800000000000)
         mydict = request.data.copy()

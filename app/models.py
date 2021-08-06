@@ -66,6 +66,7 @@ class Dynamic_review(models.Model):
 # 反馈
 class feedback(models.Model):
     feed_id = models.CharField(max_length=20)
+    feed_createID = models.CharField(max_length=64)
     feedback_context = models.TextField()
     feedback_time = models.CharField(max_length=64)
     # 反馈处理人

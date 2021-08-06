@@ -21,25 +21,6 @@ class Bucket_Handle():  #存储桶操作
     #     print(self.client.list_buckets())
     #     return self.client.list_buckets()
 
-    def Upload_File(self,filename,filepath):
-        data ={
-            'key':None,
-            'msg':None,
-            'rul':None,
-        }
-        bucket_name = "tanghuadong"
-        # 3600为token过期时间，秒为单位。3600等于一小时
-        token =self.q.upload_token(bucket_name, filename, 3600)
-        info = put_file(token, filename, filepath)
-        if(info[0]['key'] ==filename):
-            print('得到的是：'+filename)
-            data['key']= filename
-            data['msg']= "上传成功"
-            data["url"]= "http://qw4kwhslj.hd-bkt.clouddn.com/"+filename
-            return data
-        else:
-            data['msg'] = '上传失败,请稍后重试'
-            return data
     def upToken(self):
         bucket_name = "tanghuadong"
         # 3600为token过期时间，秒为单位。3600等于一小时
