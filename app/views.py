@@ -74,19 +74,26 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
                     'create_ip': request.META.get("REMOTE_ADDR"),
                 })
                 serializer = self.get_serializer(data=result)
-                serializer.is_valid(raise_exception=False)
-                roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=result["avator_image"])['token']
-                User_token.objects.update_or_create(
-                    token_id=User.objects.filter(user_mobile=user_mobile).first(),
-                    user_token=roogtoken)
-                Redata = {}
-                Redata["token"] = serializer.token
-                Redata["msg"] = "成功"
-                Redata["roogtoken"] = roogtoken
-                Redata["avator_image"] = result["avator_image"]
-                Redata["user_id"] = result["user_id"]
-                Redata["user_name"] = result["user_name"]
-                return JsonResponse(Redata)
+                res = serializer.is_valid(raise_exception=False)
+                print(res)
+                if res:
+                    print(serializer.errors)
+                    roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=result["avator_image"])['token']
+                    User_token.objects.update_or_create(
+                        token_id=User.objects.filter(user_mobile=user_mobile).first(),
+                        user_token=roogtoken)
+                    Redata = {}
+                    Redata["token"] = serializer.token
+                    Redata["msg"] = "成功"
+                    Redata["roogtoken"] = roogtoken
+                    Redata["avator_image"] = result["avator_image"]
+                    Redata["user_id"] = result["user_id"]
+                    Redata["user_name"] = result["username"]
+                    print(oc)
+                    return Response(Redata)
+                else:
+                    oc['msg'] = '不存在'
+                    return JsonResponse(oc)
             except Exception as e:
                 print(e)
                 oc['msg']='不存在'
@@ -111,6 +118,7 @@ class RegisterUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin)
     pass
 
 class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
+
     serializer_class = Image_Serializers
     authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
@@ -125,7 +133,7 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         else:
-            query = Dynamic_Image.objects.all()
+            query = Dynamic_Image.objects.all().order_by('-id')
             queryset = self.filter_queryset(query)
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -147,6 +155,7 @@ class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
             "Up_ImageUrl":json.dumps(Up_image),
             "New_Imagename": str(new_filename),
             "Old_Imagename": str('old'),
+            "Dynamic_Id":random.randint(100000,90000000)
         })
         serializer = self.get_serializer(data=result)
         res = serializer.is_valid(raise_exception=False)
@@ -163,7 +172,7 @@ class DynamicAll(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
     serializer_class = Image_Serializers
     def list(self, request, *args, **kwargs):
-        query = Dynamic_Image.objects.all()
+        query = Dynamic_Image.objects.order_by('-id')
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -180,10 +189,8 @@ class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixi
     authentication_classes = [Jwt_Authentication]
     serializer_class = review_Serializers
     def list(self, request, *args, **kwargs):
-
-        rid = request.query_params.get("review_rd")
-        print(rid)
-        query = Dynamic_review.objects.filter(review_rd=request.query_params.get("review_rd")).all()
+        review_dynamic = request.query_params.get("review_dynamic")
+        query = Dynamic_review.objects.filter(review_dynamicid=review_dynamic).all()
         queryset = self.filter_queryset(query)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -199,6 +206,7 @@ class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixi
         }
         serializer = self.get_serializer(data=request.data)
         res = serializer.is_valid(raise_exception=False)
+        print(serializer.errors)
         if res:
             result.update({
                 "code":status.HTTP_200_OK
@@ -497,7 +505,6 @@ class Videos(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 import requests
 import json
 class GetQiNiuToken(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
-    authentication_classes = [Jwt_Authentication]
     def create(self, request, *args, **kwargs):
         QiuToken = Bucket_Handle().upToken()
         return Response(QiuToken)
@@ -618,7 +625,6 @@ class VideosList(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin)
 class VideoFilter(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
     authentication_classes = [Jwt_Authentication]
     serializer_class = VideoReviews_Serializers
-
     # 获取对应视频的评论
     def list(self, request, *args, **kwargs):
         Review_id = request.query_params.get('Review_id')

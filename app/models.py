@@ -42,6 +42,7 @@ class User_Image(models.Model):
     Up_Time = models.TimeField(auto_now=True)
     Up_ImageUrl = models.ImageField('照片',upload_to='%Y/%m/%d/')
 
+# 发布动态
 class Dynamic_Image(models.Model):
     user_id = models.CharField(max_length=16)
     Up_Time = models.CharField(max_length=64)
@@ -53,15 +54,17 @@ class Dynamic_Image(models.Model):
     Up_addres = models.CharField(max_length=16)
     Up_name = models.CharField(max_length=16)
     Up_avator= models.TextField()
+    Dynamic_Id = models.CharField(max_length=64)
 
 # 动态评论
 class Dynamic_review(models.Model):
-    review_rd = models.IntegerField(default=1)
+    review_userid = models.CharField(max_length=32)
     recview_avator = models.TextField()
     review_content = models.CharField(max_length=64)
     review_name = models.CharField(max_length=16)
     review_time = models.CharField(max_length=64)
     review_bool = models.IntegerField(default=0)
+    review_dynamicid = models.CharField(max_length=64)
 
 # 反馈
 class feedback(models.Model):
