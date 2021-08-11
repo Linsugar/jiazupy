@@ -3,9 +3,8 @@ import time
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models.query_utils import Q
-from django.http import JsonResponse, QueryDict
+from django.http import JsonResponse
 from rest_framework.response import Response
-import json
 import os
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
@@ -75,9 +74,8 @@ class JiaUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin):
                 })
                 serializer = self.get_serializer(data=result)
                 res = serializer.is_valid(raise_exception=False)
-                print(res)
+                print(serializer.errors)
                 if res:
-                    print(serializer.errors)
                     roogtoken = rong.register_roog(name=request.data['username'],user_id=userid,portraitUri=result["avator_image"])['token']
                     User_token.objects.update_or_create(
                         token_id=User.objects.filter(user_mobile=user_mobile).first(),

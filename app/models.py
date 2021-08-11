@@ -146,6 +146,7 @@ class Videosmodel(models.Model):
     video_url = models.TextField()
     video_cover = models.TextField()
 
+
 # 招聘信息
 class Recruitment(models.Model):
     # 招聘唯一id
@@ -185,6 +186,7 @@ class VideosTabs(models.Model):
     # 视频内容
     video_Content = models.CharField(max_length=264,null=True)
     video_url = models.TextField()
+    video_show = models.BooleanField(default=False)
 
 # 视频评论
 class VideosReviews(models.Model):

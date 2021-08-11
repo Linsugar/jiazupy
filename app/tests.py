@@ -58,4 +58,12 @@ from datetime import datetime
 # stime = datetime.now()
 # s = stime.strftime('%Y-%m-%d %H:%M:%S')
 # print(s)
-print(len("https://thirdwx.qlogo.cn/mmopen/vi_32/AH3uEYUVGPdxgMic6eCAx8LJdibgx0Z2gVeJO5yOhZ3VsLqdtxue2egPsdlmtSw0uBh63hazibChicvdtnUIPQlS6w/132"))
+# print(len("https://thirdwx.qlogo.cn/mmopen/vi_32/AH3uEYUVGPdxgMic6eCAx8LJdibgx0Z2gVeJO5yOhZ3VsLqdtxue2egPsdlmtSw0uBh63hazibChicvdtnUIPQlS6w/132"))
+
+
+a = 1628588558093
+
+aflterTime = datetime.now().timestamp()+24*60*60
+noteTime = datetime.now().timestamp()
+print(noteTime)
+print(aflterTime>noteTime)

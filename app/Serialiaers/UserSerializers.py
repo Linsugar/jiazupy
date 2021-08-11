@@ -1,5 +1,5 @@
 
-from rest_framework.serializers import ModelSerializer,ValidationError,JSONField,CharField
+from rest_framework.serializers import ModelSerializer,ValidationError,JSONField,CharField,BooleanField
 import re
 from app.untils.Md5Catch import GetLocalTime
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
@@ -10,6 +10,7 @@ from app.models import User, User_Image, Dynamic_Image, feedback, releasenew, Us
 
 class User_Serializers(ModelSerializer):
     create_time = CharField(required=False, max_length=64, allow_blank=True,default=GetLocalTime().GetTimeYearTime())
+    is_active = BooleanField(default=True)
     class Meta:
         model = User
         fields = "__all__"
