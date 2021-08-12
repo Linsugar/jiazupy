@@ -50,6 +50,7 @@ class Image_Serializers(ModelSerializer):
         model = Dynamic_Image
         fields = "__all__"
 
+
     def validate(self, attrs):
         Up_Title = attrs.get('Up_Title')
         Up_Context = attrs.get('Up_Context')
