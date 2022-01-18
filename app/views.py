@@ -199,7 +199,7 @@ class DynamicRevicew(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixi
 
     def create(self, request, *args, **kwargs):
         result = {
-            "msg": "成功",
+            "msg": "发布成功",
             "code": 200
         }
         serializer = self.get_serializer(data=request.data)
