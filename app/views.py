@@ -274,7 +274,7 @@ class FeedBackDeal(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin)
         fe.feedback = feed_content
         fe.save()
         result = {
-            "msg":"处理成功"
+            "msg": "成功"
         }
         return Response(result)
 
@@ -292,7 +292,7 @@ class RelMessage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        news_id = request.data.get("news_id")
+        # news_id = request.data.get("news_id")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -602,7 +602,7 @@ class VideosList(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin)
         video_id = random.randint(100000000000,800000000000)
         mydict = request.data.copy()
         mydict.update({
-            "video_id":video_id
+            "video_id": video_id
         })
         serializer = self.get_serializer(data=mydict)
         serializer.is_valid(raise_exception=True)
@@ -639,7 +639,7 @@ class VideoFilter(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin
     def create(self, request, *args, **kwargs):
         res = {
             "msg":"评论成功",
-            "code":status.HTTP_200_OK
+            "code": status.HTTP_200_OK
         }
         serializer = self.get_serializer(data=request.data)
         result = serializer.is_valid(raise_exception=False)
@@ -652,6 +652,6 @@ class VideoFilter(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin
             detail = err['non_field_errors'][0]
             res.update({
                 "msg": detail,
-                "code":status.HTTP_400_BAD_REQUEST
+                "code": status.HTTP_400_BAD_REQUEST
             })
             return Response(res)
