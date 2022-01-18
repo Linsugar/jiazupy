@@ -57,7 +57,6 @@ class Jwt_Authentication(BaseJSONWebTokenAuthentication):
             raise AuthenticationFailed('非法用户')
         token = self.leng_jwt(jwt_value)
         try:
-
             payload = jwt_decode_handler(token)
         except jwt.ExpiredSignature:
             raise AuthenticationFailed('已过期')

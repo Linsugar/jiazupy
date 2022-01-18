@@ -169,7 +169,7 @@ class Videos_Serializers(ModelSerializer):
         fields = '__all__'
 
     def validate(self, attrs):
-        print(attrs)
+
         image = attrs.get('video_Image')
         title = attrs.get('video_Title')
         content = attrs.get('video_Content')

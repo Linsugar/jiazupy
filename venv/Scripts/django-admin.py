@@ -1,4 +1,4 @@
-#!D:\tang\jiazu2\venv\Scripts\python.exe
+#!D:\tang\jiazu\venv\Scripts\python.exe
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 

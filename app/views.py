@@ -118,7 +118,7 @@ class RegisterUser(GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin)
 class DynamicImage(GenericViewSet,mixins.CreateModelMixin,mixins.ListModelMixin):
 
     serializer_class = Image_Serializers
-    authentication_classes = [Jwt_Authentication]
+    # authentication_classes = [Jwt_Authentication]
     def list(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id',None)
         if user_id is not None:

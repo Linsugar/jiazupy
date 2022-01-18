@@ -87,8 +87,8 @@ DATABASES = {
         'NAME': 'jiazu',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': '115.159.126.116',
-        'PORT': '3366'
+        'HOST': '139.155.88.241',
+        'PORT': '3388'
     }
 }
 
